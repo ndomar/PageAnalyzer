@@ -1,4 +1,4 @@
 .DS_Store
+bot_login.rb
 pages/*
 papers/*
-bot_login.rb
