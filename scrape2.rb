@@ -1,11 +1,14 @@
 ["rubygems", "curb", "happymapper", "xml_definitions", "bot_login"].each {|x| require x}
 
-revisions = 10
+revisions = "max"
 pages = File.read("pages.txt").split
 
 # @user_name & @password are located in the bot_login.rb file.
 @user_agent = "ChrisSalij_Bot_Contact:_Chris@Salij.org"
-@cookie_file = "cookies.txt"
+
+if @user_name.nil? || @password.nil?
+  puts "X Please Supply a username and password"
+end
 
 puts "\nEstablishing Connection"        #Start Login to the English Wikipedia Site
 login_xml = Curl::Easy.new "http://en.wikipedia.org/w/api.php?action=login&format=xml" do |curl|
