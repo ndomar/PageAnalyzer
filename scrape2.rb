@@ -96,8 +96,14 @@ puts "Baking Cookies"
 end
 @cookie_string += "#{@cookie_prefix}Token=#{@lgtoken}; #{@cookie};"
 
+if !File.directory? "pages" # If a directectory called pages does not exist in the current folder, create it.
+  puts "Created the 'pages' folder to store downloaded data"
+  Dir.mkdir "pages"
+end
+
 puts "Fetching data from Wikipedia for the following pages"
-Dir.mkdir "pages" unless File.directory? "pages" # If a directectory called pages does not exist in the current folder, create it.
+
+
 pages.each do |page|
   puts "  ✓ #{page.gsub("_", " ")}"
   wikitext = Curl::Easy.new "http://en.wikipedia.org/w/api.php?action=query&prop=revisions&titles=#{page}&rvprop=ids|timestamp|user|comment|content&rvlimit=#{revisions}&format=xml" do |curl|
