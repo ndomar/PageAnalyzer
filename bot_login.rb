@@ -1,2 +1,3 @@
-@user_name = "ChrisSalij_Bot"
-@password = "odcsss"
+# Enter your own bot info here
+@user_name = ""
+@password = ""
