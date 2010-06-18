@@ -3,11 +3,6 @@
 
 revisions = "max"
 pages = File.read("pages.txt").split
-# bot_login.rb holds the login information
-
-if @user_name.nil? || @password.nil?
-  puts "X Please Supply a username and password"
-end
 
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------# 
 # Go to wikipedia and download the data for the various pages that were requested
@@ -31,8 +26,8 @@ pages.each do |page|
   wikitext.body_str.gsub! '</rev>', '</text></rev>'
   
   File.open("pages/#{page}.xml", "w"){|f| f.write(wikitext.body_str)}   # Save the modified xml to a file.
-  # puts Rev.parse(wikitext.body_str).length
+  puts "# of Revisions: #{Rev.parse(wikitext.body_str).length}"
 end
 puts "Time to complete this run: #{Time.now - total_timer_start}"
 
-puts "\nDone Downloading Data. Downloaded a total of #{revisions*pages.length} revisions over #{pages.length} pages\n"
+#puts "\nDone Downloading Data. Downloaded a total of #{revisions*pages.length} revisions over #{pages.length} pages\n"
