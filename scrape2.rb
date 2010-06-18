@@ -1,7 +1,9 @@
+# This code is not pretty. It is not optimised, but it works.
 ["rubygems", "curb", "happymapper", "xml_definitions", "bot_login"].each {|x| require x}
 
 revisions = "max"
 pages = File.read("pages.txt").split
+
 # @user_name & @password are located in the bot_login.rb file.
 @user_agent = "ChrisSalij_Bot_Contact:_Chris@Salij.org"
 @cookie_file = "cookies.txt"
@@ -19,7 +21,6 @@ login_xml = Curl::Easy.new "http://en.wikipedia.org/w/api.php?action=login&forma
     if header.include?("Set-Cookie: enwiki_session=") && header.include?("; path=/; HttpOnly")      
       @enwiki_session = header.clone
       @enwiki_session.gsub! "Set-Cookie: ", ""
-      @enwiki_session.gsub! "; path=/; HttpOnly ", ""
     end
     header.length
   end
