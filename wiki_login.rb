@@ -1,6 +1,9 @@
 ["rubygems", "curb", "happymapper", "xml_definitions", "bot_login"].each {|x| require x}
 # This code logs you into wikipedia using the API. 
 # It gets the usernme, password & useragent from bot_login.rb
+if @user_name.nil? || @password.nil?
+  puts "X Please Supply a username and password"
+end
 
 #--------------------------------------------------------------------------------------------------------------------------------------#
 # Start Login to the English Wikipedia Site #
@@ -45,7 +48,9 @@ puts "Attempting to Login"
 #--------------------------------------------------------------------------------------------------------------------------------------#
 headers = []
 confirm = Curl::Easy.new "http://en.wikipedia.org/w/api.php?action=login&format=xml" do |curl|
-  curl.http_post Curl::PostField.content("lgname", @user_name), Curl::PostField.content("lgpassword", @password), Curl::PostField.content("lgtoken", @token)
+  curl.http_post  Curl::PostField.content("lgname", @user_name),
+                  Curl::PostField.content("lgpassword", @password),
+                  Curl::PostField.content("lgtoken", @token)
   curl.headers["User-Agent"] = @user_agent
   curl.cookies = @enwiki_session
   curl.on_header do |header|
@@ -59,11 +64,11 @@ confirm = Curl::Easy.new "http://en.wikipedia.org/w/api.php?action=login&format=
   curl.perform
 end # puts confirm.body_str
 
-#--------------------------------------------------------------------------------------------------------------------------------------------------------------# 
-# Extract the tokens returned in the last page                      #
+#--------------------------------------------------------------------------------------------------------------------------------# 
+# Ensure that login was succesful                                   # Not used |--> Extract the tokens returned in the last page #
 # Construct the cookies necessary to have a persistant connection   #
 # Ensure that the pages/ directory exists                           #
-#--------------------------------------------------------------------------------------------------------------------------------------------------------------# 
+#--------------------------------------------------------------------------------------------------------------------------------# 
 Login.parse(confirm.body_str).each do |login|
   if login.result.eql? "Success"
     puts "  Logged In ✓"
