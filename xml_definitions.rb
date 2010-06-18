@@ -1,17 +1,19 @@
-# HappyMapper uses this class to define a Revision, 
-# what attributes each revision has, and how to access
-# the text of that revision.
+# HappyMapper uses this class to define the object to
+# extract from the XML. What attributes it has etc
+# Each attribute/element can be called as a method
 
+# Defines a revision. Mainly used in the parsing code.
 class Rev
   include HappyMapper
-  attribute :revid, Integer
-  attribute :parentid, Integer
-  attribute :user, String
-  attribute :comment, String
-  attribute :timestamp, String
-  element :text, String
+  attribute :revid, Integer         # The unique identifier of a revision
+  attribute :parentid, Integer      # No idea what this is yet :P
+  attribute :user, String           # The name of the user that made a change
+  attribute :comment, String        # Comment a user made about a revision
+  attribute :timestamp, String      # DateTime a revision was made
+  element :text, String             # Used to access the text of a revision
 end
 
+# Defines a login object. Used mainly in wiki_login.rb during the authentication process.
 class Login
   include HappyMapper
   attribute :result, String         #Is either NeedToken or Success
