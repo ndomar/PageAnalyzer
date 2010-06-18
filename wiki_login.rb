@@ -27,14 +27,14 @@ end # puts login_xml.body_str
 # Extract the session variable                        #
 # Extract the login token returned in the last page   #
 #--------------------------------------------------------------------------------------------------------------------------------------#
-i = 0
+i = 0; cont = "go"
 begin
   if @enwiki_session[i..i].eql? ";"
     @enwiki_session = @enwiki_session[0..i]
-    cont = false
+    cont = "stop"
   end
   i += 1
-end while cont != false
+  end while !cont.eql? "stop"
 
 Login.parse(login_xml.body_str).each do |login|
   if login.result.eql? "NeedToken"
