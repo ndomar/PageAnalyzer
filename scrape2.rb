@@ -14,7 +14,7 @@ total_timer_start = Time.now
 pages.each do |page|
   puts "  ✓ #{page.gsub("_", " ")}"
   page_timer_start = Time.now
-  wikitext = Curl::Easy.new "http://en.wikipedia.org/w/api.php?action=query&prop=revisions&titles=#{page}&rvprop=ids|timestamp|user|comment|content&rvlimit=#{revisions}&format=xml" do |curl|
+  xml = Curl::Easy.new "http://en.wikipedia.org/w/api.php?action=query&prop=revisions&titles=#{page}&rvprop=ids|timestamp|user|comment|content&rvlimit=#{revisions}&format=xml" do |curl|
     curl.cookies = @cookies
     curl.headers = {"User-Agent" => @user_agent}
     curl.perform
@@ -22,11 +22,28 @@ pages.each do |page|
   download_time[page] = Time.now - page_timer_start
   
   # This does a search and replace on the retrieved text. It makes it much simpler to traverse later on.
-  wikitext.body_str.gsub! 'xml:space="preserve">', 'xml:space="preserve"><text>'
-  wikitext.body_str.gsub! '</rev>', '</text></rev>'
+  xml.body_str.gsub! 'xml:space="preserve">', 'xml:space="preserve"><text>'
+  xml.body_str.gsub! '</rev>', '</text></rev>'
   
-  File.open("pages/#{page}.xml", "w"){|f| f.write(wikitext.body_str)}   # Save the modified xml to a file.
-  puts "# of Revisions: #{Rev.parse(wikitext.body_str).length}"
+  
+  # The following code needs to be looped in order to get multiple revisions 
+    #File.open("pages/#{page}.xml", "w"){|f| f.write(xml.body_str)}   # Save the modified xml to a file.
+    continutation_rev = Rev.parse(xml.body_str).last.revid
+    xml1 = Curl::Easy.new "http://en.wikipedia.org/w/api.php?action=query&prop=revisions&titles=#{page}&rvprop=ids|timestamp|user|comment|content&rvlimit=#{revisions}&rvstartid=#{continutation_rev}&format=xml" do |curl|
+      curl.cookies = @cookies
+      curl.headers = {"User-Agent" => @user_agent}
+      curl.perform
+    end
+    
+    #File.open("pages/#{page}1.xml", "w"){|f| f.write(xml.body_str)}   # Save the modified xml to a file.
+    
+    
+    hit = remove_head xml1.body_str
+    hit = remove_tail hit
+    
+    File.open("pages/#{page}1.xml", "w"){|f| f.write(hit)}   # Save the modified xml to a file.
+    #puts "# of Revisions: #{Rev.parse(xml1.body_str).length}"
+  #
 end
 puts "Time to complete this run: #{Time.now - total_timer_start}"
 
