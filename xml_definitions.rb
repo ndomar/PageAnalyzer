@@ -11,6 +11,7 @@ class Rev
   attribute :comment, String        # Comment a user made about a revision
   attribute :timestamp, String      # DateTime a revision was made
   element :text, String             # Used to access the text of a revision
+  element :hash, String             # A hash of the text of the revision. I added this to make it easy to check if two revisions were identical
 end
 
 # Defines a login object. Used mainly in wiki_login.rb during the authentication process.
