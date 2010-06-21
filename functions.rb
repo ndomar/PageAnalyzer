@@ -19,23 +19,28 @@ def process_user_hash
   end
 end
 
-# Takes the text of 3 revisions and compute the edit distance between them
-def process_text revs
-  
-  rev1 = @first.text.pair_distance_similar @second.text
-  rev2 = @second.text.pair_distance_similar @third.text
-  rev3 = @first.text.pair_distance_similar @rev.text
-  
-  puts "#{rev1} : #{@second.user}"
-  puts "#{rev2} : #{@third.user}"
-  puts "#{rev3} : "
+# On every turn in the loop the following much be done
+def process_revision rev, revs
+  @user_hash[rev.user] = @user_hash.fetch(rev.user, 0)+1    # Collect user information
+  rev.hash = Digest::SHA1.hexdigest rev.text                # Set the hash value (a hash of the text) for each revisions
+  rev.age = compute_edit_age rev, revs.last                 # Get the edit age
+  revert? rev, revs
+  if revs.length > 1
+    compute_intermediate_revision rev, revs.last, revs
+  end
+  revs.push rev
 end
 
-#Check to see if this middle edit was a bad edit, in the eyes of the other two
+#   Takes the text of 3 revisions and compute the edit distance between them
+#   rev1 = @first.text.pair_distance_similar @second.text
+#   rev2 = @second.text.pair_distance_similar @third.text
+#   rev3 = @first.text.pair_distance_similar @rev.text
+
+# Check to see if this middle edit was a bad edit, in the eyes of the other two
 def bad_edit? rev1, rev2, rev3
   if rev1 > rev2 && rev2 < rev3
-    puts @second.user
-    puts @second.comment
+    puts rev2.user
+    puts rev2.comment
   end
 end
 
@@ -46,6 +51,7 @@ def revert? rev, revs
   revs.reverse.each do |each|
     if rev.hash.eql? each.hash
       puts "#{rev.user} just reverted back #{i} revisions to #{each.user}'s version"
+      puts revs.fetch(revs.length-(i+1)).user
       # puts "#{rev.hash} #{rev.user} #{rev.timestamp}"
       # puts "#{each.hash} #{each.user} #{each.timestamp}"
     end
@@ -63,8 +69,17 @@ end
 # Since they obviously wanted the later revision to be their final one
 def compute_intermediate_revision rev1, rev2, revs
   time = 3*60*60 # Years*Weeks*Days*Hours*Minues*Seconds
-  if rev1.user.eql?(rev2.user) && (Time.parse(rev1.timestamp).to_i-Time.parse(rev2.timestamp).to_i) < time
-    #puts "These two edits by the same person are very close together"
+  if rev1.user.eql?(rev2.user) && rev1.age < time
+    # puts "These two edits by the same person are very close together"
     revs.pop
+  end
+end
+
+# Get the age of a revision. i.e. how long that revision has lasted before it was changed
+def compute_edit_age rev1, rev2
+  if rev2.nil?
+    return nil
+  else
+    return Time.parse(rev1.timestamp).to_i-Time.parse(rev2.timestamp).to_i
   end
 end
