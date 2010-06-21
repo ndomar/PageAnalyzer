@@ -1,3 +1,4 @@
+# This file provides a number of custom functions used in the parse.rb file
 require "amatch"
 include Amatch
 
@@ -38,12 +39,8 @@ def bad_edit? rev1, rev2, rev3
   end
 end
 
-def immeditate_revert? rev3
-  if rev3 === 1.0
-    puts "#{@third.user} just reverted #{@second.user}'s edit, back to #{@first.user}'s version"
-  end
-end
-
+# See if the current revision is exactly the same as a previous revision (a revert)
+# Also identify over how many revisions the revert was made
 def revert? rev, revs
   i = 1
   revs.reverse.each do |each|
@@ -54,12 +51,20 @@ def revert? rev, revs
     end
     i+=1
   end
+# def immeditate_revert? rev3
+#   if rev3 === 1.0
+#     puts "#{@third.user} just reverted #{@second.user}'s edit, back to #{@first.user}'s version"
+#   end
+# end
 end
 
-def compute_immediate_revision
-  if @first.user.eql?(@second.user) && (Time.parse(@second.timestamp)-Time.parse(@first.timestamp)) > 15
-    puts "These two edits by the same person are very close together"
-  elsif @second.user.eql?(@third.user) && (Time.parse(@third.timestamp)-Time.parse(@second.timestamp)) > 15
-    puts "These two edits by the same person are very close together"
+# Computes to see if the same person made 2 revisions in a short timespan.
+# If they did, then discard the first revision and only keep the second
+# Since they obviously wanted the later revision to be their final one
+def compute_intermediate_revision rev1, rev2, revs
+  time = 3*60*60 # Years*Weeks*Days*Hours*Minues*Seconds
+  if rev1.user.eql?(rev2.user) && (Time.parse(rev1.timestamp).to_i-Time.parse(rev2.timestamp).to_i) < time
+    #puts "These two edits by the same person are very close together"
+    revs.pop
   end
 end
