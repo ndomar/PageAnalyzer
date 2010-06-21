@@ -1,7 +1,7 @@
 # This code is not pretty. It is not optimised, but it works.
 ["rubygems", "curb", "bot_login", "wiki_login"].each {|x| require x}
 
-revisions = 520
+revisions = 20
 pages = File.read("pages.txt").split
 
 # Truncates the head of an xml article making it
