@@ -1,4 +1,5 @@
 .DS_Store
 bot_login.rb
+pages.txt
 pages/*
 papers/*
