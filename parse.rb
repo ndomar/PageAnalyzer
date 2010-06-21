@@ -1,5 +1,5 @@
 # This parses the information in an xml doc downloaded using the scrape2.rb script
-["rubygems", "happymapper", "functions", "xml_definitions"].each {|x| require x}
+["rubygems", "happymapper", "digest/sha1", "functions", "xml_definitions"].each {|x| require x}
 pages = File.read("pages.txt").split
 
 pages.each do |page|
@@ -18,7 +18,8 @@ pages.each do |page|
   revs = []
   revisions.reverse.each do |rev|
     @user_hash[rev.user] = @user_hash.fetch(rev.user, 0) + 1 # Collect user information
-    # puts Time.parse(rev.timestamp).to_i
+    rev.hash = Digest::SHA1.hexdigest rev.text
+    revert? rev, revs
     revs.push rev
     
     if revs.length > 2
@@ -34,6 +35,8 @@ pages.each do |page|
     puts "------"
   end
 end
+# puts Time.parse(rev.timestamp).to_i
+
 # process_user_hash user_hash
 # 
 # puts "List of all users"
