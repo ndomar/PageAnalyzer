@@ -44,6 +44,18 @@ def immeditate_revert? rev3
   end
 end
 
+def revert? rev, revs
+  i = 1
+  revs.reverse.each do |each|
+    if rev.hash.eql? each.hash
+      puts "#{rev.user} just reverted back #{i} revisions to #{each.user}'s version"
+      # puts "#{rev.hash} #{rev.user} #{rev.timestamp}"
+      # puts "#{each.hash} #{each.user} #{each.timestamp}"
+    end
+    i+=1
+  end
+end
+
 def compute_immediate_revision
   if @first.user.eql?(@second.user) && (Time.parse(@second.timestamp)-Time.parse(@first.timestamp)) > 15
     puts "These two edits by the same person are very close together"
