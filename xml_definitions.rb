@@ -1,4 +1,4 @@
-# HappyMapper uses this class to define the object to
+# HappyMapper uses these classes to define the object to
 # extract from the XML. What attributes it has etc
 # Each attribute/element can be called as a method
 
