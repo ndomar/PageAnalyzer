@@ -24,11 +24,12 @@ def process_revision rev, revs
   @user_hash[rev.user] = @user_hash.fetch(rev.user, 0)+1    # Collect user information
   rev.hash = Digest::SHA1.hexdigest rev.text                # Set the hash value (a hash of the text) for each revisions
   rev.age = compute_edit_age rev, revs.last                 # Get the edit age
-  revert? rev, revs
+  revert = revert? rev, revs
   if revs.length > 1
     compute_intermediate_revision rev, revs.last, revs
   end
   revs.push rev
+  return revert
 end
 
 #   Takes the text of 3 revisions and compute the edit distance between them
@@ -47,16 +48,18 @@ end
 # See if the current revision is exactly the same as a previous revision (a revert)
 # Also identify over how many revisions the revert was made
 def revert? rev, revs
-  i = 1
-  revs.reverse.each do |each|
+  i = revs.length
+  revs.each do |each|
     if rev.hash.eql? each.hash
       puts "#{rev.user} just reverted back #{i} revisions to #{each.user}'s version"
-      puts revs.fetch(revs.length-(i+1)).user
+      return each.revid
+      # puts revs.fetch(revs.length-(i+1)).user
       # puts "#{rev.hash} #{rev.user} #{rev.timestamp}"
       # puts "#{each.hash} #{each.user} #{each.timestamp}"
     end
-    i+=1
+    i-=1
   end
+  return nil
 # def immeditate_revert? rev3
 #   if rev3 === 1.0
 #     puts "#{@third.user} just reverted #{@second.user}'s edit, back to #{@first.user}'s version"
