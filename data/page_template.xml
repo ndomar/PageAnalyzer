@@ -1,9 +1,0 @@
-<?xml version="1.0"?>
-<page>											<!-- All the information about a page (Minus the revision text)-->
-	<name></name>								<!-- Name of the page e.g. Google -->
-	<links><links>								<!-- The pages which this page links to -->
-	<editor_count></editor_count> 				<!-- The number of editors who have contributed to this page -->
-	<edits>										<!-- The edits which have been made on this page -->
-		<edit revid="revid" user="username"/>	<!-- The details of this specific edit. Not the text though -->
-	</edits>
-</page>

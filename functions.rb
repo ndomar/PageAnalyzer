@@ -24,12 +24,12 @@ def process_revision rev, revs
   @user_hash[rev.user] = @user_hash.fetch(rev.user, 0)+1    # Collect user information
   rev.hash = Digest::SHA1.hexdigest rev.text                # Set the hash value (a hash of the text) for each revisions
   rev.age = compute_edit_age rev, revs.last                 # Get the edit age
-  revert = revert? rev, revs
+  prepare_revision rev, revert?(rev, revs).nil?             # Add the contents of the current revision to the revision file
+  
   if revs.length > 1
     compute_intermediate_revision rev, revs.last, revs
   end
   revs.push rev
-  return revert
 end
 
 #   Takes the text of 3 revisions and compute the edit distance between them
@@ -85,4 +85,21 @@ def compute_edit_age rev1, rev2
   else
     return Time.parse(rev1.timestamp).to_i-Time.parse(rev2.timestamp).to_i
   end
+end
+
+def prepare_revision rev, revert
+  if !revert.nil?
+    @revision_file += "<revision revertid=\"#{revert}\">"
+  else
+    @revision_file += "<revision revertid=\"\">"
+  end
+  @revision_file += "<revid>#{rev.revid}</revid>"
+  @revision_file += "<parentid>#{rev.parentid}</parentid>"
+  @revision_file += "<user>#{rev.user}</user>"
+  @revision_file += "<timestamp>#{rev.timestamp}</timestamp>"
+  @revision_file += "<unixtime>#{Time.parse(rev.timestamp).to_i}</unixtime>"
+  @revision_file += "<age>#{rev.age}</age>"
+  @revision_file += "<comment>#{rev.comment}</comment>"
+  @revision_file += "<text>#{rev.text}</text>"
+  @revision_file += "</rev>"
 end
