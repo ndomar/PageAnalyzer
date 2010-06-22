@@ -1,6 +1,6 @@
 .DS_Store
 bot_login.rb
 pages.txt
-data/
+data/*
 pages/*
 papers/*
