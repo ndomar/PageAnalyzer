@@ -15,6 +15,13 @@ class Rev
   element :age, Integer             # A unix timestamp of how long an edit lasted before another revision came along
 end
 
+# Defines a backlink. Used to get all the articles that link to a page
+class Bl
+  include HappyMapper
+  attribute :pageid, Integer
+  attribute :title, String
+end
+
 # Defines a login object. Used mainly in wiki_login.rb during the authentication process.
 class Login
   include HappyMapper
