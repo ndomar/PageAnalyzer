@@ -1,8 +1,6 @@
 .DS_Store
 bot_login.rb
 pages.txt
-data/page_*.xml
-data/user_*.xml
-data/revisions_*.xml
+data/
 pages/*
 papers/*
