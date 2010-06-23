@@ -6,7 +6,7 @@ start = Time.now
 
 pages.each do |page|
   @user_hash = {}; @unreg_hash = {}; @reg_hash = {} # Initialise/Empty User Hashes for each page
-  File.open("data/page_#{page}.xml", "w"){|f| f.write("<?xml version=\"1.0\"?><revisions>")}
+  File.open("data/revisions_#{page}.xml", "w"){|f| f.write("<?xml version=\"1.0\"?><revisions>")}
   @user_file = "<?xml version=\"1.0\"?><user>"
   File.open("data/page_#{page}.xml", "w"){|f| f.write("<?xml version=\"1.0\"?><page><name>#{page}</name><revisions></revisions></page>")}
   
@@ -37,7 +37,6 @@ pages.each do |page|
     link_text += "<link pageid=\"#{link.pageid}\" title=\"#{link.title}\">"
   end
   link_text += "</links>"
-  
   page_add_links page, link_text
   
 end
