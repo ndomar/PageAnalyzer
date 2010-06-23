@@ -2,12 +2,10 @@
 <user>
 	<name></name>								<!-- The Name of a user -->
 	<registered></registered>					<!-- Boolean, whether the user is registered or not -->
-	<reverts_performed></reverts_performed> 	<!-- The number of edits this user has reverted this user has done -->
-	<reverted_edits></reverted_edits> 			<!-- The number of edits of the user that have been reverted -->
-	<page>										<!-- All the pages this this user has contributed to -->
-		<name></name>							<!-- The name of that page -->
-		<edits>									<!-- The edits that this user had made to this page -->
-			<edit revid="revid" />				<!-- The details of this particular edit -->
-		</edits>								
-	</page>
+	<reverts></reverts> 						<!-- The number of edits this user has reverted this user has done -->
+	<reverted_count></reverted_count> 			<!-- The number of edits of the user that have been reverted -->
+	<userpage name="Google" >
+		<userrev revisionid="1212" />
+		<userrev revisionid="1212" />
+	</userpage>
 </user>

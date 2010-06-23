@@ -56,3 +56,38 @@ class Revision
   element :comment, String
   element :text, String
 end
+
+class UserRev
+  include HappyMapper
+  attribute :revisionid, String
+  attribute :user, String
+end
+
+class UserPage
+  include HappyMapper
+  attribute :name, String
+  has_many :revisions, UserRev
+end
+
+class User
+  include HappyMapper
+  element :name, String
+  element :registered, String
+  element :reverted, Integer
+  element :reverted_count, Integer
+  has_many :pages, UserPage
+end
+
+class Link
+  include HappyMapper
+  attribute :pageid, Integer
+  attribute :title, String
+end
+
+class Page
+  include HappyMapper
+  element :name, String
+  element :editor_count, String
+  has_many :links, Link
+  has_many :revisions, UserRev
+end
