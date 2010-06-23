@@ -1,8 +1,7 @@
 # This code is not pretty. It is not optimised, but it works.
 ["rubygems", "curb", "bot_login", "wiki_login"].each {|x| require x}
 
-revisions_to_get = 2000
-links_to_get = 10000
+revisions_to_get = 1000
 pages = File.read("pages.txt").split
 
 # Truncates the head of an xml article making it
@@ -108,13 +107,10 @@ pages.each do |page|
   
   @page_data = ""
   begin  # Get the Link
-    if links_to_get < revisions_per_query
-      links_to_get = revisions_per_query
-    end
     if last_link == 0                          # If we're on the first query, get the last X revisions starting at the most recent revision available
-      query_url = "http://en.wikipedia.org/w/api.php?action=query&list=backlinks&bltitle=#{page}&bllimit=#{revisions_per_query}&format=xml"
+      query_url = "http://en.wikipedia.org/w/api.php?action=query&list=backlinks&bltitle=#{page}&bllimit=max&format=xml"
     else                                      # If we're on a subsequent query, get the last X revisions starting at the revision previous to the oldest one we have on record
-      query_url = "http://en.wikipedia.org/w/api.php?action=query&list=backlinks&bltitle=#{page}&bllimit=#{revisions_per_query}&blcontinue=#{last_link-1}format=xml"
+      query_url = "http://en.wikipedia.org/w/api.php?action=query&list=backlinks&bltitle=#{page}&bllimit=max&blcontinue=#{last_link-1}format=xml"
       @page_data = remove_tail @page_data, "bl"
     end
     
