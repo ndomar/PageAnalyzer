@@ -44,6 +44,8 @@ end
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------# 
 # Storage Objects #
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------# 
+# Defines a revision, as seen in revision_template.xml
+# For use with happymapper obviously
 class Revision
   include HappyMapper
   attribute :revertid, Integer
@@ -57,18 +59,23 @@ class Revision
   element :text, String
 end
 
+# Defines a revisions as seen in user_template.xml & page_template.xml
+# It should probably be renamed.... But I'll get round to that in a bit
 class UserRev
   include HappyMapper
   attribute :revisionid, String
   attribute :user, String
 end
 
+# Defines a page a user has contributed to
+# As seen in user_template.xml
 class UserPage
   include HappyMapper
   attribute :name, String
   has_many :revisions, UserRev
 end
 
+# Defines a User as seen in User_template.xml
 class User
   include HappyMapper
   element :name, String
@@ -78,12 +85,14 @@ class User
   has_many :pages, UserPage
 end
 
+# Defines a link, as used by page_template.xml
 class Link
   include HappyMapper
   attribute :pageid, Integer
   attribute :title, String
 end
 
+# Defines a page, as used by page_template.xml
 class Page
   include HappyMapper
   element :name, String
