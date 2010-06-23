@@ -1,4 +1,4 @@
-["rubygems", "curb", "happymapper", "xml_definitions", "bot_login"].each {|x| require x}
+["rubygems", "curb", "happymapper", "definitions/xml_definitions", "bot_login"].each {|x| require x}
 # This code logs you into wikipedia using the API. 
 # It gets the usernme, password & useragent from bot_login.rb
 if @user_name.nil? || @password.nil?
