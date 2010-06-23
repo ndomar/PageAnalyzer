@@ -29,7 +29,7 @@ pages.each do |page|
     # puts "------"
   end
   
-  File.open("data/revisions_#{page}.xml", "w"){|f| f.write("</revisions>")}
+  File.open("data/revisions_#{page}.xml", "a"){|f| f.write("</revisions>")}
   
   links = Bl.parse link_string
   link_text = "<links>"
