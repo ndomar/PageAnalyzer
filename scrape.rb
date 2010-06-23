@@ -1,7 +1,7 @@
 # This code is not pretty. It is not optimised, but it works.
 ["rubygems", "curb", "bot_login", "wiki_login"].each {|x| require x}
 
-revisions_to_get = 1000
+revisions_to_get = 500
 pages = File.read("pages.txt").split
 
 # Truncates the head of an xml article making it
@@ -94,7 +94,7 @@ pages.each do |page|
       last_rev = Rev.parse(text.body_str).last.revid
     end
     #puts "    # of Revisions: #{revisions_this_query}"
-  end while revision_count < revisions_to_get && revisions_this_query != 0
+  end while revision_count < revisions_to_get && revisions_this_query > 0
   
   # This does a search and replace on the retrieved text. It makes it much simpler to traverse later on.
   @page_data.gsub! 'xml:space="preserve">', 'xml:space="preserve"><text>'
@@ -132,21 +132,20 @@ pages.each do |page|
       end
       last_rev = Bl.parse(text.body_str).last.pageid
     end # puts "    # of Links: #{links_this_query}"
-  end while revision_count < revisions_to_get && revisions_this_query != 0
+  end while revision_count < revisions_to_get && revisions_this_query < 0
   
   File.open("pages/#{page}_links.xml", "w"){|f| f.write(@page_data)}
   download_time[page] = Time.now - page_timer_start
   total_link_count = Bl.parse(File.read("pages/#{page}_links.xml")).length
   puts "      + #{total_link_count} links Downloaded"
   
-  if total_rev_count == revision_count
-    puts "    - Total # of Revisions: #{Rev.parse(File.read("pages/#{page}.xml")).length}"
-  else
-    puts "    Shit something went wrong. Our count is off"
-  end
-  overall_revision_count += total_rev_count
-  overall_link_count += total_link_count
-  
+  # if total_rev_count == revision_count
+  #   puts "    - Total # of Revisions: #{Rev.parse(File.read("pages/#{page}.xml")).length}"
+  # else
+  #   puts "    Shit something went wrong. Our count is off"
+  # end
+  # overall_revision_count += total_rev_count
+  # overall_link_count += total_link_count  
 end
 
 puts
