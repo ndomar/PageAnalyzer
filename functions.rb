@@ -19,29 +19,12 @@ def process_user_hash
   end
 end
 
-def prepare_revision_file rev, revert
-  if !revert.nil?
-    @revision_file += "<revision revertid=\"#{revert}\">"
-  else
-    @revision_file += "<revision revertid=\"\">"
-  end
-  @revision_file += "<revid>#{rev.revid}</revid>"
-  @revision_file += "<parentid>#{rev.parentid}</parentid>"
-  @revision_file += "<user>#{rev.user}</user>"
-  @revision_file += "<timestamp>#{rev.timestamp}</timestamp>"
-  @revision_file += "<unixtime>#{Time.parse(rev.timestamp).to_i}</unixtime>"
-  @revision_file += "<age>#{rev.age}</age>"
-  @revision_file += "<comment>#{strip rev.comment}</comment>"
-  @revision_file += "<text xml:space=\"preserve\">#{strip rev.text}</text>"
-  @revision_file += "</revision>"
-end
-
 # On every turn in the loop the following much be done
-def process_revision rev, revs
-  #@user_hash[rev.user] = @user_hash.fetch(rev.user, 0)+1    # Collect user information
+def process_revision rev, revs, page
+  @user_hash[rev.user] = @user_hash.fetch(rev.user, 0)+1    # Collect user information
   rev.hash = Digest::SHA1.hexdigest rev.text                # Set the hash value (a hash of the text) for each revisions
   rev.age = compute_edit_age rev, revs.last                 # Get the edit age
-  prepare_revision_file rev, revert?(rev, revs)             # Add the contents of the current revision to the revision file
+  revision_add_revision rev, revert?(rev, revs), page             # Add the contents of the current revision to the revision file
   
   if revs.length > 1
     compute_intermediate_revision rev, revs.last, revs
@@ -57,43 +40,8 @@ def bad_edit? rev1, rev2, rev3
   end
 end
 
-# See if the current revision is exactly the same as a previous revision (a revert)
-# Also identify over how many revisions the revert was made
-def revert? rev, revs
-  i = revs.length
-  revs.each do |each|
-    if rev.hash.eql? each.hash
-      #puts "#{rev.user} just reverted back #{i} revisions to #{each.user}'s version" 
-      return each.revid
-      # puts revs.fetch(revs.length-(i+1)).user
-      # puts "#{rev.hash} #{rev.user} #{rev.timestamp}"
-      # puts "#{each.hash} #{each.user} #{each.timestamp}"
-    end
-    i-=1
-  end
-  return nil
-end
-
-# Computes to see if the same person made 2 revisions in a short timespan.
-# If they did, then discard the first revision and only keep the second
-# Since they obviously wanted the later revision to be their final one
-def compute_intermediate_revision rev1, rev2, revs
-  time = 3*60*60 # Years*Weeks*Days*Hours*Minues*Seconds
-  if rev1.user.eql?(rev2.user) && rev1.age < time
-    # puts "These two edits by the same person are very close together"
-    revs.pop
-  end
-end
-
-# Get the age of a revision. i.e. how long that revision has lasted before it was changed
-def compute_edit_age rev1, rev2
-  if rev2.nil?
-    return nil
-  else
-    return Time.parse(rev1.timestamp).to_i-Time.parse(rev2.timestamp).to_i
-  end
-end
-  
+# Add a revision to a page. See definitions/user_template.xml
+# for the layout of a user file
 def user_add_revision name, page, revisionid
   if File.exists? "data/user_#{name}.xml"             # Check to see if the user exits
     str = File.read "data/user_#{name}.xml"
@@ -138,6 +86,96 @@ def user_add_revision name, page, revisionid
   end
 end
 
+# Add a revision to a page. See definitions/page_template.xml
+# for the layout of a page file
+def page_add_revision page, user, revisionid
+  #  puts "inserting user rev #{revisionid}"
+    str = File.read "data/page_#{page}.xml"
+    file = nil
+    i = str.length
+    begin
+      # Go Backward until you've found the page we're looking for.
+      if str[i..i+11].eql? "</revisions>"
+        file = str[0..i-1]+"<userrev revisionid=\"#{revisionid}\" user=\"#{user}\"/>"+str[i..str.length]
+        File.open("data/page_#{page}.xml", "w"){|f| f.write(file)}
+      end
+      i -=1
+    end while file.nil? && i > -1
+end
+
+private
+
+# Get the age of a revision. i.e. how long that revision has lasted before it was changed
+def compute_edit_age rev1, rev2
+  if rev2.nil?
+    return nil
+  else
+    return Time.parse(rev1.timestamp).to_i-Time.parse(rev2.timestamp).to_i
+  end
+end
+
+# Computes to see if the same person made 2 revisions in a short timespan.
+# If they did, then discard the first revision and only keep the second
+# Since they obviously wanted the later revision to be their final one
+def compute_intermediate_revision rev1, rev2, revs
+  time = 3*60*60 # Years*Weeks*Days*Hours*Minues*Seconds
+  if rev1.user.eql?(rev2.user) && rev1.age < time
+    # puts "These two edits by the same person are very close together"
+    revs.pop
+  end
+end
+
+# Prepare the revision file for writing to disk
+def revision_add_revision rev, revert, page
+  revision_file = ""
+  if !revert.nil?
+    revision_file += "<revision revertid=\"#{revert}\">"
+  else
+    revision_file += "<revision revertid=\"\">"
+  end
+  revision_file += "<revid>#{rev.revid}</revid>"
+  revision_file += "<parentid>#{rev.parentid}</parentid>"
+  revision_file += "<user>#{rev.user}</user>"
+  revision_file += "<timestamp>#{rev.timestamp}</timestamp>"
+  revision_file += "<unixtime>#{Time.parse(rev.timestamp).to_i}</unixtime>"
+  revision_file += "<age>#{rev.age}</age>"
+  revision_file += "<comment>#{strip rev.comment}</comment>"
+  revision_file += "<text xml:space=\"preserve\">#{strip rev.text}</text>"
+  revision_file += "</revision>"
+  File.open("data/revision_#{page}.xml", "a"){|f| f.write(revision_file)}
+  
+end
+
+def page_add_links page, links
+  file = nil
+  str = File.read "data/page_#{page}.xml"
+  i = 0
+  begin
+    if str[i..i+7].eql? "</name>"
+      file = [0..i+7]+links+[i+8..str.length]
+      File.open("data/page_#{page}.xml", "w"){|f| f.write(file)}
+    end
+    i += 1
+  end while file.nil? && i < str.length
+end
+
+# See if the current revision is exactly the same as a previous revision (a revert)
+# Also identify over how many revisions the revert was made
+def revert? rev, revs
+  i = revs.length
+  revs.each do |each|
+    if rev.hash.eql? each.hash
+      #puts "#{rev.user} just reverted back #{i} revisions to #{each.user}'s version" 
+      return each.revid
+      # puts revs.fetch(revs.length-(i+1)).user
+      # puts "#{rev.hash} #{rev.user} #{rev.timestamp}"
+      # puts "#{each.hash} #{each.user} #{each.timestamp}"
+    end
+    i-=1
+  end
+  return nil
+end
+
 def user_insert_revision name, str, page, revisionid
 #  puts "inserting user rev #{revisionid}"
   file = nil
@@ -156,27 +194,6 @@ def user_insert_revision name, str, page, revisionid
     end
     i -=1
   end while file.nil? && i > -1
-end
-
-def page_add_revision page, user, revisionid
-  # Go and add this revision to the page
-    # Check to see if the page exits
-      # If it doesn't, then create it
-      # And call this method again
-    # 
-      # If it doesn, append this revision to the file
-end
-
-def user_create_page name
-  
-end
-
-def user_add_revert
-  
-end
-
-def user_add_reverted
-
 end
 
 def strip str
