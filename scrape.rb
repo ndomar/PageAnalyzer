@@ -135,8 +135,7 @@ pages.each do |page|
         @page_data += text.body_str
       end
       last_rev = Bl.parse(text.body_str).last.pageid
-    end
-    puts "    # of Links: #{links_this_query}"
+    end # puts "    # of Links: #{links_this_query}"
   end while revision_count < revisions_to_get && revisions_this_query != 0
   
   File.open("pages/#{page}_links.xml", "w"){|f| f.write(@page_data)}
