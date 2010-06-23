@@ -142,7 +142,7 @@ def revision_add_revision rev, revert, page
   revision_file += "<comment>#{strip rev.comment}</comment>"
   revision_file += "<text xml:space=\"preserve\">#{strip rev.text}</text>"
   revision_file += "</revision>"
-  File.open("data/revision_#{page}.xml", "a"){|f| f.write(revision_file)}
+  File.open("data/revisions_#{page}.xml", "a"){|f| f.write(revision_file)}
   
 end
 
