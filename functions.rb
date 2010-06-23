@@ -103,8 +103,6 @@ def page_add_revision page, user, revisionid
     end while file.nil? && i > -1
 end
 
-private
-
 # Get the age of a revision. i.e. how long that revision has lasted before it was changed
 def compute_edit_age rev1, rev2
   if rev2.nil?
@@ -125,7 +123,8 @@ def compute_intermediate_revision rev1, rev2, revs
   end
 end
 
-# Prepare the revision file for writing to disk
+# Add a revision to a revision file, based on the xml definition
+# as seen in definitions/revision_template.xml
 def revision_add_revision rev, revert, page
   revision_file = ""
   if !revert.nil?
@@ -144,6 +143,28 @@ def revision_add_revision rev, revert, page
   revision_file += "</revision>"
   File.open("data/revisions_#{page}.xml", "a"){|f| f.write(revision_file)}
   
+end
+
+# Insert a revision to a user file, based on the xml definition
+# as seen in definitions/revision_template.xml
+def user_insert_revision name, str, page, revisionid
+#  puts "inserting user rev #{revisionid}"
+  file = nil
+  i = str.length
+  begin
+    # Go Backward until you've found the page we're looking for.
+    if str[i..(i+18+page.length)].eql? "<userpage name=\"#{page}\" >"
+      j = i
+      begin       # Once you found the page, go forward until we're at the right section to insert
+        if str[j..j+10].eql? "</userpage>"
+          file = str[0..j-1]+"<userrev revisionid=\"#{revisionid}\" />"+str[j..str.length]
+          File.open("data/user_#{name}.xml", "w"){|f| f.write(file)}
+        end
+        j += 1
+      end while file.nil? && j < str.length-10
+    end
+    i -=1
+  end while file.nil? && i > -1
 end
 
 def page_add_links page, links
@@ -176,26 +197,7 @@ def revert? rev, revs
   return nil
 end
 
-def user_insert_revision name, str, page, revisionid
-#  puts "inserting user rev #{revisionid}"
-  file = nil
-  i = str.length
-  begin
-    # Go Backward until you've found the page we're looking for.
-    if str[i..(i+18+page.length)].eql? "<userpage name=\"#{page}\" >"
-      j = i
-      begin       # Once you found the page, go forward until we're at the right section to insert
-        if str[j..j+10].eql? "</userpage>"
-          file = str[0..j-1]+"<userrev revisionid=\"#{revisionid}\" />"+str[j..str.length]
-          File.open("data/user_#{name}.xml", "w"){|f| f.write(file)}
-        end
-        j += 1
-      end while file.nil? && j < str.length-10
-    end
-    i -=1
-  end while file.nil? && i > -1
-end
-
+# Strip any encoding shouldn't be in xml
 def strip str
   str.gsub! "<", "&lt;"
   str.gsub! ">", "&gt;"
