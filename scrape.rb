@@ -1,7 +1,7 @@
 # This code is not pretty. It is not optimised, but it works.
 ["rubygems", "curb", "bot_login", "wiki_login"].each {|x| require x}
 
-revisions_to_get = 500
+revisions_to_get = 7000
 pages = File.read("pages.txt").split
 
 # Truncates the head of an xml article making it
@@ -132,7 +132,7 @@ pages.each do |page|
       end
       last_rev = Bl.parse(text.body_str).last.pageid
     end # puts "    # of Links: #{links_this_query}"
-  end while revision_count < revisions_to_get && revisions_this_query < 0
+  end while revision_count < revisions_to_get && revisions_this_query > 0
   
   File.open("pages/#{page}_links.xml", "w"){|f| f.write(@page_data)}
   download_time[page] = Time.now - page_timer_start
