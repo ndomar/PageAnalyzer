@@ -1,7 +1,7 @@
 # This code is not pretty. It is not optimised, but it works.
 ["rubygems", "curb", "bot_login", "wiki_login"].each {|x| require x}
 
-revisions_to_get = 200
+revisions_to_get = 1000
 pages = File.read("pages.txt").split
 
 # Truncates the head of an xml article making it
@@ -81,6 +81,7 @@ pages.each do |page|
       curl.cookies = @cookies                       # Set the login Cookies
       curl.headers = {"User-Agent" => @user_agent}
     end # puts text.body_str
+    File.open("pages/#{page}#{last_rev}.xml", "w"){|f| f.write(text.body_str)} # Append the current set of revisions to the existing ones
     
     page_data = text.body_str
     revisions_this_query = Rev.parse(text.body_str).length  # The amount of revisions returned in this query
@@ -150,7 +151,7 @@ pages.each do |page|
   # end
   # overall_revision_count += total_rev_count
   # overall_link_count += total_link_count
-  puts "  ✓" 
+  puts "    ✓" 
 end
 
 puts "\a"
