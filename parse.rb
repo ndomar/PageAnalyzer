@@ -23,10 +23,12 @@ pages.each do |page|
   revisions = Rev.parse data_string              # Use HappyMapper to make an array of the revisions
   
   revisions.reverse.each do |rev|
-    process_revision rev, revs, page         # What must be done on each revision@revision_file
-    user_add_revision rev.user, page, rev.revid
-    page_add_revision page, rev.user, rev.revid
-    # puts "------"
+    if !rev.text.nil?
+      process_revision rev, revs, page         # What must be done on each revision@revision_file
+      user_add_revision rev.user, page, rev.revid
+      page_add_revision page, rev.user, rev.revid
+      # puts "------"
+    end
   end
   
   File.open("data/revisions_#{page}.xml", "a"){|f| f.write("</revisions>")}
