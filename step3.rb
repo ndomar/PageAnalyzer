@@ -8,12 +8,12 @@ pages.each do |page|
   revisions = Revision.parse File.read"data/revisions_#{page}.xml"
   revisions.reverse.each do |revision|
     if prev_revert_id === revision.revid
-      puts "-- #{revision.user} #{revision.revid} I am the king"
+      puts "-- #{revision.user} is the originator" #{revision.revid}"
       prev_revert_id = 0
     end 
 
     if prev_revert_id != 0 && revision.revertid.nil?
-      puts "  #{revision.user} just got his edit reverted #{revision.revid}"
+      puts "  #{revision.user} just got his edit reverted "#{revision.revid}"
     end
     
     if !revision.revertid.nil?
