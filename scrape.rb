@@ -1,7 +1,7 @@
 # This code is not pretty. It is not optimised, but it works.
 ["rubygems", "curb", "bot_login", "wiki_login"].each {|x| require x}
 
-revisions_to_get = 1000
+revisions_to_get = 3000
 pages = File.read("pages.txt").split
 
 # Truncates the head of an xml article making it
@@ -55,8 +55,7 @@ end
 puts "\nFetching data from Wikipedia for the following pages"
 puts "  Page: Revs, Links, Done"
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------# 
-revisions_per_query = 500                     # Set the maximum number of revisions per query to get (Max 500)
-download_time = {}                            # Tracks the time taken for each individual download. Not used at the moment
+revisions_per_query = 500                     # Set the maximum number of revisions per query to get (Max 500)                           # Tracks the time taken for each individual download. Not used at the moment
 total_timer_start = Time.now
 overall_revision_count = 0
 overall_link_count = 0
@@ -64,11 +63,11 @@ STDOUT.sync = true
 
 pages.each do |page|  
   print " #{page.gsub("_", " ")}"
-  page_timer_start = Time.now
   last_rev = 0
   last_link = 0
   revision_count = 0
   link_count = 0
+  @page_data = ""
   
   File.open("pages/#{page}.xml", "w"){|f| f.write("")}
   begin   # Get the revisions
@@ -76,50 +75,47 @@ pages.each do |page|
     if revisions_to_get < revisions_per_query
       revisions_to_get = revisions_per_query
     end
-    if last_rev == 0                          # If we're on the first query, get the last X revisions starting at the most recent revision available
+    if last_rev == 0          # If we're on the first query, get the last X revisions starting at the most recent revision available
       query_url = "http://en.wikipedia.org/w/api.php?action=query&prop=revisions&titles=#{page}&rvprop=ids|timestamp|user|comment|content&rvlimit=#{revisions_per_query}&format=xml"
-    else                                      # If we're on a subsequent query, get the last X revisions starting at the revision previous to the oldest one we have on record
+    else                      # If we're on a subsequent query, get the last X revisions starting at the revision previous to the oldest one we have on record
       query_url = "http://en.wikipedia.org/w/api.php?action=query&prop=revisions&titles=#{page}&rvprop=ids|timestamp|user|comment|content&rvlimit=#{revisions_per_query}&rvstartid=#{last_rev-1}&format=xml"
     end
     
-    text = Curl::Easy.perform query_url do |curl|       # Make the request
+    text = Curl::Easy.perform query_url do |curl|   # Make the request
       curl.cookies = @cookies                       # Set the login Cookies
       curl.headers = {"User-Agent" => @user_agent}
     end # puts text.body_str
-    File.open("pages/#{page}#{last_rev}.xml", "w"){|f| f.write(text.body_str)} # Append the current set of revisions to the existing ones
     
     page_data = text.body_str
-    revisions_this_query = Rev.parse(text.body_str).length  # The amount of revisions returned in this query
-    revision_count += revisions_this_query
+    revisions_this_query = Rev.parse(text.body_str).length  # Get the amount of revisions returned in this query
+    revision_count += revisions_this_query					# Add the revisions returned in this query to the total amount for this page
     
-    if last_rev != 0
-      page_data = remove_head page_data, "rev"
+    if last_rev != 0										# If we're not on the first query 
+      page_data = remove_head page_data, "rev"					# remove the head of the document (XML declaration etc)
     end
     
-    if revisions_this_query != 0
-      page_data = remove_tail page_data, "rev"
+    if revisions_this_query != 0							# If there was were revision returned in this request
+      page_data = remove_tail page_data, "rev"					# Remove the tail of the document
       
-      # This does a search and replace on the retrieved text. It makes it much simpler to traverse later on.
+      # This adds an extra tag to each revision. It means that the text of each revision can be accessed as an element of it.
       page_data.gsub! 'xml:space="preserve">', 'xml:space="preserve"><text>'
       page_data.gsub! '</rev>', '</text></rev>'
-      # puts page_data[0..300]
       File.open("pages/#{page}.xml", "a"){|f| f.write(page_data)} # Append the current set of revisions to the existing ones
+      last_rev = Rev.parse(text.body_str).last.revid 			# Store the revision to continue on in the next query
     end
-    
-    last_rev = Rev.parse(text.body_str).last.revid
-    #puts "    # of Revisions: #{revisions_this_query}"
   end while revision_count < revisions_to_get && revisions_this_query != 0
-  File.open("pages/#{page}.xml", "a"){|f| f.write("</revisions></page></pages></query><query-continue><revisions rvstartid=\"357322858\" /></query-continue></api>")}
   
-  download_time[page] = Time.now - page_timer_start
-  total_rev_count = Rev.parse(File.read("pages/#{page}.xml")).length
+  File.open("pages/#{page}.xml", "a"){|f| f.write("</revisions></page></pages></query><query-continue><revisions rvstartid=\"357322858\" /></query-continue></api>")} # Once we have all the results we need, append the correct ending to the file.
+  total_rev_count = Rev.parse(File.read("pages/#{page}.xml")).length 		# Get the definitive number of revisions returned for this page
+  overall_revision_count += total_rev_count
   print ":  #{total_rev_count}"
   
-  @page_data = ""
-  begin  # Get the Links
-    if last_link == 0                          # If we're on the first query, get the last X revisions starting at the most recent revision available
+  
+  # Get the links pointing to this page
+  begin  
+    if last_link == 0                         # Get the maximum number of links to this mage
       query_url = "http://en.wikipedia.org/w/api.php?action=query&list=backlinks&bltitle=#{page}&bllimit=max&format=xml"
-    else                                      # If we're on a subsequent query, get the last X revisions starting at the revision previous to the oldest one we have on record
+    else                                      # If there are more links, get as many more as possbile, starting at the most recent one gotten
       query_url = "http://en.wikipedia.org/w/api.php?action=query&list=backlinks&bltitle=#{page}&bllimit=max&blcontinue=#{last_link}&format=xml"
       @page_data = remove_tail @page_data, "bl"
     end
@@ -128,34 +124,28 @@ pages.each do |page|
       curl.cookies = @cookies                       	# Set the login Cookies
       curl.headers = {"User-Agent" => @user_agent}
     end # puts text.body_str
-    links_this_query = Bl.parse(text.body_str).length  # The amount of revisions returned in this query
+    
+    links_this_query = Bl.parse(text.body_str).length 	# Get the amount of links returned in this query
     link_count += links_this_query
     
-    if links_this_query == 0                    # Then we've gone back as far as we can.
-      @page_data += @tail                       # Add the tail back on that was chopped off
-    else                                        # Don't both parsing it as there is nothing to parse
-      if last_link != 0                         # If this is not the first query
-        @page_data += remove_head text.body_str, "bl"
-      else
-        @page_data += text.body_str
+    if links_this_query == 0                    	# If we've gotten all the links available
+      @page_data += @tail                       		# Add the closing tags to the document
+    else                                        	# Otherwise
+      if last_link != 0                         		# If we're not on the first request
+        @page_data += remove_head text.body_str, "bl"		# Remove the head of the text returned, and append it to the end of the data collected so far
+      else												# If we are on the first request
+        @page_data += text.body_str							# Save the returned text to be used later
       end
-      last_link = Backlinks.parse(text.body_str).last.blcontinue
-    end # puts "    # of Links: #{links_this_query}"
-  end while links_this_query > 0
+      last_link = Backlinks.parse(text.body_str).last.blcontinue # Get the point from which we should continue
+    end
+  end while links_this_query > 0					# While there is still more to get, get more links
   
   File.open("pages/#{page}_links.xml", "w"){|f| f.write(@page_data)}
-  download_time[page] = Time.now - page_timer_start
-  total_link_count = Bl.parse(File.read("pages/#{page}_links.xml")).length
+  total_link_count = Bl.parse(File.read("pages/#{page}_links.xml")).length	# Get the definitive number of links returned for this page
   print ",	#{total_link_count}"
-  
-  # if total_rev_count == revision_count
-  #   puts "    - Total # of Revisions: #{Rev.parse(File.read("pages/#{page}.xml")).length}"
-  # else
-  #   puts "    Shit something went wrong. Our count is off"
-  # end
-  # overall_revision_count += total_rev_count
   overall_link_count += total_link_count
-  puts "    ✓" 
+  
+  puts "    ✓"
 end
 
 puts "\a"
