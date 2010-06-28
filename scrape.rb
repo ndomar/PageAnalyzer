@@ -4,7 +4,7 @@
 revisions_to_get = 3000
 pages = File.read("pages.txt").split
 
-# Truncates the head of an xml article making it
+# Truncates the head of an xml document making it
 # start with the opening tag of the first revision
 def remove_head str, state
   if state.eql? "rev"
@@ -23,7 +23,7 @@ def remove_head str, state
   return str
 end
 
-# Truncates the tail of an xml article making it
+# Truncates the tail of an xml document making it
 # end on the close tag of the last revision
 def remove_tail str, state
   if state.eql? "rev"
@@ -57,16 +57,14 @@ puts "  Page: Revs, Links, Done"
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------# 
 revisions_per_query = 500                     # Set the maximum number of revisions per query to get (Max 500)                           # Tracks the time taken for each individual download. Not used at the moment
 total_timer_start = Time.now
-overall_revision_count = 0
-overall_link_count = 0
+total_revision_count = 0
+total_link_count = 0
 STDOUT.sync = true
 
 pages.each do |page|  
   print " #{page.gsub("_", " ")}"
   last_rev = 0
   last_link = 0
-  total_revision_count = 0
-  total_link_count = 0
   revision_count = 0
   link_count = 0
   @page_data = ""
@@ -128,17 +126,17 @@ pages.each do |page|
     links_this_query = Bl.parse(text.body_str).length 	# Get the amount of links returned in this query
     link_count += links_this_query
     
-    if links_this_query == 0                    	# If we've gotten all the links available
-      @page_data += @tail                       		# Add the closing tags to the document
-    else                                        	# Otherwise
-      if last_link != 0                         		# If we're not on the first request
-        @page_data += remove_head text.body_str, "bl"		# Remove the head of the text returned, and append it to the end of the data collected so far
-      else												# If we are on the first request
-        @page_data += text.body_str							# Save the returned text to be used later
+    if links_this_query == 0                      # If we've gotten all the links available
+      @page_data += @tail                           # Add the closing tags to the document
+    else                                          # Otherwise
+      if last_link != 0                             # If we're not on the first request
+        @page_data += remove_head text.body_str, "bl" # Remove the head of the text returned, and append it to the end of the data collected so far
+      else                                          # If we are on the first request
+        @page_data += text.body_str                   # Save the returned text to be used later
       end
       last_link = Backlinks.parse(text.body_str).last.blcontinue # Get the point from which we should continue
     end
-  end while links_this_query > 0					# While there is still more to get, get more links
+  end while links_this_query > 0                # While there is still more to get, get more links
   
   File.open("pages/#{page}_links.xml", "w"){|f| f.write(@page_data)}
   print ",	#{link_count}"
