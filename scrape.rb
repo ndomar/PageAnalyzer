@@ -65,6 +65,8 @@ pages.each do |page|
   print " #{page.gsub("_", " ")}"
   last_rev = 0
   last_link = 0
+  total_revision_count = 0
+  total_link_count = 0
   revision_count = 0
   link_count = 0
   @page_data = ""
