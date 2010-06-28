@@ -88,28 +88,26 @@ pages.each do |page|
     
     page_data = text.body_str
     revisions_this_query = Rev.parse(text.body_str).length  # Get the amount of revisions returned in this query
-    revision_count += revisions_this_query					# Add the revisions returned in this query to the total amount for this page
+    revision_count += revisions_this_query                  # Add the revisions returned in this query to the total amount for this page
     
-    if last_rev != 0										# If we're not on the first query 
-      page_data = remove_head page_data, "rev"					# remove the head of the document (XML declaration etc)
+    if last_rev != 0                                        # If we're not on the first query 
+      page_data = remove_head page_data, "rev"              # remove the head of the document (XML declaration etc)
     end
     
-    if revisions_this_query != 0							# If there was were revision returned in this request
-      page_data = remove_tail page_data, "rev"					# Remove the tail of the document
+    if revisions_this_query != 0                            # If there was were revision returned in this request
+      page_data = remove_tail page_data, "rev"              # Remove the tail of the document
       
       # This adds an extra tag to each revision. It means that the text of each revision can be accessed as an element of it.
       page_data.gsub! 'xml:space="preserve">', 'xml:space="preserve"><text>'
       page_data.gsub! '</rev>', '</text></rev>'
       File.open("pages/#{page}.xml", "a"){|f| f.write(page_data)} # Append the current set of revisions to the existing ones
-      last_rev = Rev.parse(text.body_str).last.revid 			# Store the revision to continue on in the next query
+      last_rev = Rev.parse(text.body_str).last.revid              # Store the revision to continue on in the next query
     end
   end while revision_count < revisions_to_get && revisions_this_query != 0
   
   File.open("pages/#{page}.xml", "a"){|f| f.write("</revisions></page></pages></query><query-continue><revisions rvstartid=\"357322858\" /></query-continue></api>")} # Once we have all the results we need, append the correct ending to the file.
-  total_rev_count = Rev.parse(File.read("pages/#{page}.xml")).length 		# Get the definitive number of revisions returned for this page
-  overall_revision_count += total_rev_count
+  total_revision_count += revision_count
   print ":  #{total_rev_count}"
-  
   
   # Get the links pointing to this page
   begin  
@@ -141,14 +139,13 @@ pages.each do |page|
   end while links_this_query > 0					# While there is still more to get, get more links
   
   File.open("pages/#{page}_links.xml", "w"){|f| f.write(@page_data)}
-  total_link_count = Bl.parse(File.read("pages/#{page}_links.xml")).length	# Get the definitive number of links returned for this page
-  print ",	#{total_link_count}"
-  overall_link_count += total_link_count
+  print ",	#{link_count}"
+  total_link_count += link_count
   
   puts "    ✓"
 end
 
 puts "\a"
-puts "A total of #{overall_revision_count} revisions were downloaded across #{pages.size} pages"
-puts "A total of #{overall_link_count} links were downloaded across #{pages.size} pages"
+puts "A total of #{total_revision_count} revisions were downloaded across #{pages.size} pages"
+puts "A total of #{total_link_count} links were downloaded across #{pages.size} pages"
 puts "Time to complete this run: #{(Time.now-total_timer_start)/60} minutes"
