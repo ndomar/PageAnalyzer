@@ -109,7 +109,7 @@ pages.each do |page|
   
   File.open("pages/#{page}.xml", "a"){|f| f.write("</revisions></page></pages></query><query-continue><revisions rvstartid=\"357322858\" /></query-continue></api>")} # Once we have all the results we need, append the correct ending to the file.
   total_revision_count += revision_count
-  print ":  #{total_rev_count}"
+  print ":  #{total_revision_count}"
   
   # Get the links pointing to this page
   begin  
