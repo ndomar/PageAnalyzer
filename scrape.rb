@@ -68,7 +68,7 @@ def set_name_length str
       str << " "
     end while str.length < 15
   elsif str.length > 14
-    str = str[0..12]
+    str = str[0..10]
     str << "..:"
   else
     str << ":"
@@ -84,7 +84,7 @@ pages.each do |page|
   link_count = 0
   @page_data = ""
   
-  File.open("pages/#{page}.xml", "w"){|f| f.write("")}
+  File.open("#{@folder}/#{page}.xml", "w"){|f| f.write("")}
   begin   # Get the revisions
     if revisions_to_get < revisions_per_query
       revisions_to_get = revisions_per_query
@@ -114,14 +114,14 @@ pages.each do |page|
       # This adds an extra tag to each revision. It means that the text of each revision can be accessed as an element of it.
       page_data.gsub! 'xml:space="preserve">', 'xml:space="preserve"><text>'
       page_data.gsub! '</rev>', '</text></rev>'
-      File.open("pages/#{page}.xml", "a"){|f| f.write(page_data)} # Append the current set of revisions to the existing ones
+      File.open("#{@folder}/#{page}.xml", "a"){|f| f.write(page_data)} # Append the current set of revisions to the existing ones
       last_rev = Rev.parse(text.body_str).last.revid              # Store the revision to continue on in the next query
     end
     text = nil
     page_data = nil
   end while revision_count < revisions_to_get && revisions_this_query != 0
   
-  File.open("pages/#{page}.xml", "a"){|f| f.write("</revisions></page></pages></query><query-continue><revisions rvstartid=\"357322858\" /></query-continue></api>")} # Once we have all the results we need, append the correct ending to the file.
+  File.open("#{@folder}/#{page}.xml", "a"){|f| f.write("</revisions></page></pages></query><query-continue><revisions rvstartid=\"357322858\" /></query-continue></api>")} # Once we have all the results we need, append the correct ending to the file.
   total_revision_count += revision_count
   print "#{revision_count}"
   
@@ -154,8 +154,8 @@ pages.each do |page|
     end
   end while links_this_query > 0                # While there is still more to get, get more links
   
-  File.open("pages/#{page}_links.xml", "w"){|f| f.write(@page_data)}
-  print ",	#{link_count}"
+  File.open("#{@folder}/#{page}_links.xml", "w"){|f| f.write(@page_data)}
+  print ", #{link_count},"
   total_link_count += link_count
   
   puts "    ✓"
