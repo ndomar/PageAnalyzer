@@ -1,5 +1,5 @@
 .DS_Store
 bot_login.rb
-data/*
-pages/*
 papers/*
+parsed_data/*
+scraped_data/*
