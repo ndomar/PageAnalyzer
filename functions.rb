@@ -2,6 +2,8 @@
 require "amatch"
 include Amatch
 
+@parse_folder = "parsed_data"
+
 # Seperates all the users that edited a page
 # into registered and unregistered groups
 def process_user_hash
@@ -43,8 +45,8 @@ end
 # Add a revision to a page. See definitions/user_template.xml
 # for the layout of a user file
 def user_add_revision name, page, revisionid
-  if File.exists? "data/user_#{name}.xml"             # Check to see if the user exits
-    str = File.read "data/user_#{name}.xml"
+  if File.exists? "#{@parse_folder}/user_#{name}.xml"             # Check to see if the user exits
+    str = File.read "#{@parse_folder}/user_#{name}.xml"
     user = User.parse str
     
     page_exists = false
@@ -59,6 +61,7 @@ def user_add_revision name, page, revisionid
         end
       end
     end
+    
     if page_exists                                    # If the page is already there, just add the revision
       if !revision_exists
         user_insert_revision name, str, page, revisionid # If it does, append this revision to the file
@@ -68,12 +71,12 @@ def user_add_revision name, page, revisionid
       file =nil
       begin
         if str[i..i+10].eql? "</userpage>" 
-          file = str[0..i+10]+"<userpage name=\"#{page}\" ></userpage>"+str[i..str.length]
-          File.open("data/user_#{name}.xml", "w"){|f| f.write(file)}
+          file = str[0..i+10]+"<userpage name=\"#{page}\" >"+str[i..str.length]
+          # File.open("#{@parse_folder}/user_#{name}.xml", "w"){|f| f.write(file)}
           user_insert_revision name, file, page, revisionid
         elsif str[i..i+16].eql? "</reverted_count>"
           file = str[0..i+16]+"<userpage name=\"#{page}\" ></userpage>"+str[i+16+1..str.length]
-          File.open("data/user_#{name}.xml", "w"){|f| f.write(file)}
+          # File.open("#{@parse_folder}/user_#{name}.xml", "w"){|f| f.write(file)}
           user_insert_revision name, file, page, revisionid
         end
         i-=1
@@ -81,7 +84,7 @@ def user_add_revision name, page, revisionid
     end
   else                                                # If it doesn't, then create it
     file = "<?xml version=\"1.0\"?><user><name>#{name}</name><registered></registered><reverts></reverts><reverted_count></reverted_count></user>"
-    File.open("data/user_#{name}.xml", "w"){|f| f.write(file)}
+    File.open("#{@parse_folder}/user_#{name}.xml", "w"){|f| f.write(file)}
     user_add_revision name, page, revisionid    # And call this method again
   end
 end
@@ -90,14 +93,14 @@ end
 # for the layout of a page file
 def page_add_revision page, user, revisionid
   #  puts "inserting user rev #{revisionid}"
-    str = File.read "data/page_#{page}.xml"
+    str = File.read "#{@parse_folder}/page_#{page}.xml"
     file = nil
     i = str.length
     begin
       # Go Backward until you've found the page we're looking for.
       if str[i..i+11].eql? "</revisions>"
         file = str[0..i-1]+"<userrev revisionid=\"#{revisionid}\" user=\"#{user}\"/>"+str[i..str.length]
-        File.open("data/page_#{page}.xml", "w"){|f| f.write(file)}
+        File.open("#{@parse_folder}/page_#{page}.xml", "w"){|f| f.write(file)}
       end
       i -=1
     end while file.nil? && i > -1
@@ -141,7 +144,7 @@ def revision_add_revision rev, revert, page
   revision_file += "<comment>#{strip rev.comment}</comment>"
   revision_file += "<text xml:space=\"preserve\">#{strip rev.text}</text>"
   revision_file += "</revision>"
-  File.open("data/revisions_#{page}.xml", "a"){|f| f.write(revision_file)}
+  File.open("#{@parse_folder}/revisions_#{page}.xml", "a"){|f| f.write(revision_file)}
   
 end
 
@@ -154,11 +157,11 @@ def user_insert_revision name, str, page, revisionid
   begin
     # Go Backward until you've found the page we're looking for.
     if str[i..(i+18+page.length)].eql? "<userpage name=\"#{page}\" >"
-      j = i
+      j = i+18+page.length
       begin       # Once you found the page, go forward until we're at the right section to insert
         if str[j..j+10].eql? "</userpage>"
           file = str[0..j-1]+"<userrev revisionid=\"#{revisionid}\" />"+str[j..str.length]
-          File.open("data/user_#{name}.xml", "w"){|f| f.write(file)}
+          File.open("#{@parse_folder}/user_#{name}.xml", "w"){|f| f.write(file)}
         end
         j += 1
       end while file.nil? && j < str.length-10
@@ -167,9 +170,11 @@ def user_insert_revision name, str, page, revisionid
   end while file.nil? && i > -1
 end
 
+# Add a link to a page file, based on the xml definition
+# as seen in the definitions/page_template.xml
 def page_add_links page, links
   file = nil
-  str = File.read "data/page_#{page}.xml"
+  str = File.read "parsed_data/page_#{page}.xml"
   i = 0
   begin
     if str[i..i+7].eql? "</name>"
@@ -178,6 +183,12 @@ def page_add_links page, links
     end
     i += 1
   end while file.nil? && i < str.length
+end
+
+# Compute whether this is a positive, negative or neutral edit.
+def compute_value rev
+  rev.age
+  
 end
 
 # See if the current revision is exactly the same as a previous revision (a revert)
