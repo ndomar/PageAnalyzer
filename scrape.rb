@@ -1,7 +1,7 @@
 # This code is not pretty. It is not optimised, but it works.
 ["rubygems", "curb", "bot_login", "wiki_login"].each {|x| require x}
 
-revisions_to_get = 3000
+revisions_to_get = 1000
 pages = File.read("pages.txt").split
 
 # Truncates the head of an xml document making it
@@ -53,7 +53,7 @@ end
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------# 
 # Go to wikipedia and download the data for the various pages that were requested
 puts "\nFetching data from Wikipedia for the following pages"
-puts "  Page: Revs, Links, Done"
+puts " Page:          Revs, Links, Done"
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------# 
 revisions_per_query = 500                     # Set the maximum number of revisions per query to get (Max 500)                           # Tracks the time taken for each individual download. Not used at the moment
 total_timer_start = Time.now
@@ -61,8 +61,23 @@ total_revision_count = 0
 total_link_count = 0
 STDOUT.sync = true
 
+def set_name_length str
+  if str.length < 14
+    str << ":"
+    begin 
+      str << " "
+    end while str.length < 15
+  elsif str.length > 14
+    str = str[0..12]
+    str << "..:"
+  else
+    str << ":"
+  end
+  return str.gsub("_", " ")
+end
+
 pages.each do |page|  
-  print " #{page.gsub("_", " ")}"
+  print " #{set_name_length page.clone}"
   last_rev = 0
   last_link = 0
   revision_count = 0
@@ -71,7 +86,6 @@ pages.each do |page|
   
   File.open("pages/#{page}.xml", "w"){|f| f.write("")}
   begin   # Get the revisions
-    page_data = ""
     if revisions_to_get < revisions_per_query
       revisions_to_get = revisions_per_query
     end
@@ -103,11 +117,13 @@ pages.each do |page|
       File.open("pages/#{page}.xml", "a"){|f| f.write(page_data)} # Append the current set of revisions to the existing ones
       last_rev = Rev.parse(text.body_str).last.revid              # Store the revision to continue on in the next query
     end
+    text = nil
+    page_data = nil
   end while revision_count < revisions_to_get && revisions_this_query != 0
   
   File.open("pages/#{page}.xml", "a"){|f| f.write("</revisions></page></pages></query><query-continue><revisions rvstartid=\"357322858\" /></query-continue></api>")} # Once we have all the results we need, append the correct ending to the file.
   total_revision_count += revision_count
-  print ":  #{total_revision_count}"
+  print "#{revision_count}"
   
   # Get the links pointing to this page
   begin  
