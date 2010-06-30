@@ -45,6 +45,12 @@ class Backlinks
   attribute :blcontinue, String
 end 
 
+# Defines a User as used in the scrape.rb file. Used when getting a list of bots
+class U
+  include HappyMapper
+  attribute :name, String
+end
+
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------# 
 # Storage Objects #
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------# 
