@@ -1,7 +1,6 @@
 # This file provides a number of custom functions used in the parse.rb file
 require "amatch"
 include Amatch
-
 @parse_folder = "parsed_data"
 
 # Seperates all the users that edited a page
@@ -18,17 +17,6 @@ def process_user_hash
     else
       @reg_hash[user] = @reg_hash.fetch(user, 0) + 1
     end
-  end
-end
-
-# Checks whether a user is registered
-# Returns false if they're not registered, true otherwise
-def registered? name
-  ip_check = Regexp.new(/^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/) #Regexp to identify IP addresses
-  if !ip_check.match(name).nil?       # Checks if username is an IP address
-    return false                      # Return false if the name is an IP address (And thus they are not registered)
-  else
-    return true                       # Return true otherwise
   end
 end
 
@@ -196,6 +184,29 @@ def page_add_links page, links
   end while file.nil? && i < str.length
 end
 
+# Compute how long a given number (in seconds) is
+# and returns the value in it's appropriate units
+def compute_time_taken num
+	minute = 60.000000
+	hour = 60*minute
+	day = 24*hour
+	week = 7*day
+	year = 52*week
+	if num < minute
+		return "#{num} seconds"
+	elsif num < hour
+		return  "#{num/minute} minutes"
+	elsif num < day
+		return  "#{num/hour} hours"
+	elsif num < week
+		return  "#{num/day} days"
+	elsif num < year
+		return  "#{num/week} weeks"
+	elsif num > year
+		return  "#{num/year} years"	
+	end
+end
+
 # Compute whether this is a positive, negative or neutral edit.
 def compute_value rev
   rev.age
@@ -217,6 +228,17 @@ def revert? rev, revs
     i-=1
   end
   return nil
+end
+
+# Checks whether a user is registered
+# Returns false if they're not registered, true otherwise
+def registered? name
+  ip_check = Regexp.new(/^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/) #Regexp to identify IP addresses
+  if !ip_check.match(name).nil?       # Checks if username is an IP address
+    return false                      # Return false if the name is an IP address (And thus they are not registered)
+  else
+    return true                       # Return true otherwise
+  end
 end
 
 # Strip any encoding shouldn't be in xml
