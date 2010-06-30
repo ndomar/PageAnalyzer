@@ -247,14 +247,14 @@ end
 
 
 def set_name_length str
-  if str.length < 14
+  if str.length < 19
     str << ":"
     begin 
       str << " "
-    end while str.length < 15
-  elsif str.length > 14
-    str = str[0..10]
-    str << "..:"
+    end while str.length < 20
+  elsif str.length > 19
+    str = str[0..15]
+    str << "..: "
   else
     str << ":"
   end
