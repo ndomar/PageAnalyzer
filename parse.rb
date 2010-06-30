@@ -57,5 +57,5 @@ pages.each do |page|
   puts "\aFinised Parsing Links"
   
 end
-puts Time.now-start
+puts "Time to complete this run: #{compute_time_taken(Time.now-start)}"
 puts"\a\a\a\a\a\a\a\a\a\a"
