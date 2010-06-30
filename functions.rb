@@ -21,6 +21,17 @@ def process_user_hash
   end
 end
 
+# Checks whether a user is registered
+# Returns false if they're not registered, true otherwise
+def registered? name
+  ip_check = Regexp.new(/^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/) #Regexp to identify IP addresses
+  if !ip_check.match(name).nil?       # Checks if username is an IP address
+    return false                      # Return false if the name is an IP address (And thus they are not registered)
+  else
+    return true                       # Return true otherwise
+  end
+end
+
 # On every turn in the loop the following much be done
 def process_revision rev, revs, page
   @user_hash[rev.user] = @user_hash.fetch(rev.user, 0)+1    # Collect user information
@@ -83,7 +94,7 @@ def user_add_revision name, page, revisionid
       end while file.nil? && i > -1
     end
   else                                                # If it doesn't, then create it
-    file = "<?xml version=\"1.0\"?><user><name>#{name}</name><registered></registered><reverts></reverts><reverted_count></reverted_count></user>"
+    file = "<?xml version=\"1.0\"?><user><name>#{name}</name><registered>#{registered? name}</registered><reverts></reverts><reverted_count></reverted_count></user>"
     File.open("#{@parse_folder}/user_#{name}.xml", "w"){|f| f.write(file)}
     user_add_revision name, page, revisionid    # And call this method again
   end
