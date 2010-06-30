@@ -1,5 +1,5 @@
 # This code is not pretty. It is not optimised, but it works.
-["rubygems", "curb", "bot_login", "wiki_login"].each {|x| require x}
+["rubygems", "curb", "bot_login", "wiki_login", "functions"].each {|x| require x}
 
 revisions_to_get = 1000
 pages = File.read("pages.txt").split
@@ -51,6 +51,17 @@ def remove_tail str, state
 end
 
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------# 
+# Go to wikipedia and download the list of all bots currently registered on the site
+puts "  Fetching bot list ✓"
+#--------------------------------------------------------------------------------------------------------------------------------------------------------------# 
+bot_list = Curl::Easy.perform "http://en.wikipedia.org/w/api.php?action=query&list=allusers&augroup=bot&aulimit=max&format=xml" do |curl|   # Make the request
+  curl.cookies = @cookies                       # Set the login Cookies
+  curl.headers = {"User-Agent" => @user_agent}
+end # puts text.body_str
+
+File.open("#{@folder}/bot_list.xml", "w"){|f| f.write(bot_list.body_str)}
+
+#--------------------------------------------------------------------------------------------------------------------------------------------------------------# 
 # Go to wikipedia and download the data for the various pages that were requested
 puts "\nFetching data from Wikipedia for the following pages"
 puts " Page:          Revs, Links, Done"
@@ -60,21 +71,6 @@ total_timer_start = Time.now
 total_revision_count = 0
 total_link_count = 0
 STDOUT.sync = true
-
-def set_name_length str
-  if str.length < 14
-    str << ":"
-    begin 
-      str << " "
-    end while str.length < 15
-  elsif str.length > 14
-    str = str[0..10]
-    str << "..:"
-  else
-    str << ":"
-  end
-  return str.gsub("_", " ")
-end
 
 pages.each do |page|  
   print " #{set_name_length page.clone}"
