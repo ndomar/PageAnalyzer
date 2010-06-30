@@ -8,7 +8,7 @@ pages = File.read("pages.txt").split
 start = Time.now
 
 if !File.directory? @folder # If a directectory called pages does not exist in the current folder, create it.
-  puts "Created the 'pages' folder to store downloaded data"
+  puts "\nCreated the #{@folder} folder to store parsed data"
   Dir.mkdir @folder
 end
 
