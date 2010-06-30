@@ -31,7 +31,6 @@ pages.each do |page|
   revisions = Rev.parse data_string              # Use HappyMapper to make an array of the revisions
   
   revisions.reverse.each do |rev|
-    
     if !rev.text.nil?      
       process_revision rev, revs, page         # What must be done on each revision/revision_file
       user_add_revision rev.user, page, rev.revid
@@ -43,6 +42,7 @@ pages.each do |page|
     # end
     # @prev = rev
   end
+  
   puts "Finised Parsing Revisions"
   
   File.open("#{@folder}/revisions_#{page}.xml", "a"){|f| f.write("</revisions>")}
@@ -54,7 +54,8 @@ pages.each do |page|
   end
   link_text += "</links>"
   page_add_links page, link_text
-  puts "Finised Parsing Links"
+  puts "\aFinised Parsing Links"
   
 end
 puts Time.now-start
+puts"\a\a\a\a\a\a\a\a\a\a"
