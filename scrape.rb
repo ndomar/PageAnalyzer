@@ -164,4 +164,4 @@ end
 puts "\a"
 puts "A total of #{total_revision_count} revisions were downloaded across #{pages.size} pages"
 puts "A total of #{total_link_count} links were downloaded across #{pages.size} pages"
-puts "Time to complete this run: #{(Time.now-total_timer_start)/60} minutes"
+puts "Time to complete this run: #{compute_time_taken(Time.now-total_timer_start)}"
