@@ -64,7 +64,7 @@ File.open("#{@folder}/bot_list.xml", "w"){|f| f.write(bot_list.body_str)}
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------# 
 # Go to wikipedia and download the data for the various pages that were requested
 puts "\nFetching data from Wikipedia for the following pages"
-puts " Page:          Revs, Links, Done"
+puts " #{set_name_length "Page"} Revs, Links, Done"
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------# 
 revisions_per_query = 500                     # Set the maximum number of revisions per query to get (Max 500)                           # Tracks the time taken for each individual download. Not used at the moment
 total_timer_start = Time.now

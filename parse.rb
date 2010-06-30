@@ -25,12 +25,12 @@ puts " ✓"
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------# 
 # Processing files downloaded from wikipedia.
 puts "  Processing files downloaded from wikipedia:"
-puts "  Page:          Revisions, Links"
+puts "    #{set_name_length "Page"} Revisions, Links"
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------# 
 start = Time.now
 
 pages.each do |page|
-  print "  #{set_name_length page.clone.capitalize}"
+  print "    #{set_name_length page.clone.capitalize}"
   
   @user_hash = {}; @unreg_hash = {}; @reg_hash = {} # Initialise/Empty User Hashes for each page
   
