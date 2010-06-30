@@ -44,6 +44,10 @@ end
 # Add a revision to a page. See definitions/user_template.xml
 # for the layout of a user file
 def user_add_revision name, page, revisionid
+  if name.include? "&"
+  	name.gsub! "&", "and"
+  end
+  
   if File.exists? "#{@parse_folder}/user_#{name}.xml"             # Check to see if the user exits
     str = File.read "#{@parse_folder}/user_#{name}.xml"
     user = User.parse str
@@ -239,6 +243,22 @@ def registered? name
   else
     return true                       # Return true otherwise
   end
+end
+
+
+def set_name_length str
+  if str.length < 14
+    str << ":"
+    begin 
+      str << " "
+    end while str.length < 15
+  elsif str.length > 14
+    str = str[0..10]
+    str << "..:"
+  else
+    str << ":"
+  end
+  return str.gsub("_", " ")
 end
 
 # Strip any encoding shouldn't be in xml
