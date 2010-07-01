@@ -31,7 +31,6 @@ start = Time.now
 
 pages.each do |page|
   print "    #{set_name_length page.clone.capitalize}"
-  
   @user_hash = {}; @unreg_hash = {}; @reg_hash = {} # Initialise/Empty User Hashes for each page
   
   # Create the two files we will be editing for this page
@@ -41,7 +40,7 @@ pages.each do |page|
   data_string = File.read "scraped_data/#{page}.xml"    # Get the scraped data (revisions) for this page
   
   revs = []
-  revisions = Rev.parse data_string              		# Use HappyMapper to make an array of the revisions
+  revisions = Rev.parse data_string                     # Use HappyMapper to make an array of the revisions
   revisions.reverse.each do |rev|
     if !rev.text.nil?      
       process_revision rev, revs, page         # What must be done on each revision/revision_file
@@ -53,6 +52,12 @@ pages.each do |page|
     #   puts @prev.text.levenshtein_similar rev.text
     # end
     # @prev = rev
+    
+    # Once the last revision is reached, make sure to save any leftover revisions
+    if rev === revisions.last
+      revision_add_revision revs.fetch(revs.length-2), revert?(rev, revs), page
+      revision_add_revision rev, revert?(rev, revs), page
+    end
   end
   File.open("#{@folder}/revisions_#{page}.xml", "a"){|f| f.write("</revisions>")}
   data_string = nil
