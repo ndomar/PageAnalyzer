@@ -91,7 +91,7 @@ def user_add_revision name, page, revisionid
       end while file.nil? && i > -1
     end
   else                                                # If it doesn't, then create it
-    file = "<?xml version=\"1.0\"?><user><name>#{name}</name><registered>#{registered? name}</registered><reverts></reverts><reverted_count></reverted_count></user>"
+    file = "<?xml version=\"1.0\"?>\n<user>\n<name>#{name}</name>\n<bot>#{bot? name}</bot>\n<registered>#{registered? name}</registered>\n<reverts></reverts>\n<reverted_count></reverted_count>\n</user>"
     File.open("#{@parse_folder}/user_#{name}.xml", "w"){|f| f.write(file)}
     user_add_revision name, page, revisionid    # And call this method again
   end
@@ -249,6 +249,13 @@ def registered? name
   else
     return true                       # Return true otherwise
   end
+end
+
+def bot? name
+  if @bot_list.include? name
+    return true
+  end
+  return false
 end
 
 def set_name_length str
