@@ -2,6 +2,7 @@
 require "amatch"
 include Amatch
 @parse_folder = "parsed_data"
+@scraped_folder = "scraped_data"
 
 # Seperates all the users that edited a page
 # into registered and unregistered groups
@@ -25,12 +26,16 @@ def process_revision rev, revs, page
   @user_hash[rev.user] = @user_hash.fetch(rev.user, 0)+1    # Collect user information
   rev.hash = Digest::SHA1.hexdigest rev.text                # Set the hash value (a hash of the text) for each revisions
   rev.age = compute_edit_age rev, revs.last                 # Get the edit age
-  revision_add_revision rev, revert?(rev, revs), page             # Add the contents of the current revision to the revision file
+  # revision_add_revision rev, revert?(rev, revs), page             # Add the contents of the current revision to the revision file
   
   if revs.length > 1
     compute_intermediate_revision rev, revs.last, revs
+    if @prev_length === revs.length
+      revision_add_revision revs.fetch(revs.length-3), revert?(rev, revs), page             # Add the contents of the current revision to the revision file
+    end
   end
   revs.push rev
+  @prev_length = revs.length
 end
 
 # Check to see if this middle edit was a bad edit, in the eyes of the other two
@@ -125,8 +130,10 @@ def compute_intermediate_revision rev1, rev2, revs
   time = 3*60*60 # Years*Weeks*Days*Hours*Minues*Seconds
   if rev1.user.eql?(rev2.user) && rev1.age < time
     # puts "These two edits by the same person are very close together"
-    revs.pop
+    revs.pop # Remove the latest revision from the rev list
+    return true
   end
+  return false
 end
 
 # Add a revision to a revision file, based on the xml definition
@@ -148,7 +155,6 @@ def revision_add_revision rev, revert, page
   revision_file += "<text xml:space=\"preserve\">#{strip rev.text}</text>"
   revision_file += "</revision>"
   File.open("#{@parse_folder}/revisions_#{page}.xml", "a"){|f| f.write(revision_file)}
-  
 end
 
 # Insert a revision to a user file, based on the xml definition
@@ -244,7 +250,6 @@ def registered? name
     return true                       # Return true otherwise
   end
 end
-
 
 def set_name_length str
   if str.length < 19
