@@ -30,6 +30,7 @@ class Rev
   attribute :timestamp, String      # DateTime a revision was made
   element :text, String             # Used to access the text of a revision
   element :hash, String             # A hash of the text of the revision. I added this to make it easy to check if two revisions were identical
+  element :value, String
   element :age, Integer             # A unix timestamp of how long an edit lasted before another revision came along
 end
 
@@ -65,6 +66,7 @@ class Revision
   element :timestamp, DateTime
   element :unixtime, Integer
   element :age, Integer
+  element :value, String
   element :comment, String
   element :text, String
 end
@@ -75,6 +77,7 @@ class UserRev
   include HappyMapper
   attribute :revisionid, String
   attribute :user, String
+  attribute :value, String
 end
 
 # Defines a page a user has contributed to

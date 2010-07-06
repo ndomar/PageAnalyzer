@@ -1,12 +1,13 @@
 <?xml version="1.0"?> <!-- File should be called *name*.xml, where *name* is the page name. e.g. Google.xml -->
 <revisions>											<!-- A list of all of the revisions of this page -->
-	<revision revertid="" >								<!-- An individual revision. If a revision is a revert, it stores which revision it was reverted to -->
+	<revision revertid="" >							<!-- An individual revision. If a revision is a revert, it stores which revision it was reverted to -->
 		<revid></revid>								<!-- The id of a revision -->
 		<parentid></parentid> 						<!-- The parent if of this revision -->
 		<user></user>								<!-- The user that made this particular revision -->
 		<timestamp></timestamp> 					<!-- The date-time timestamp of this revision -->
 		<unixtime></unixtime>						<!-- The unix timestamp of this revision -->
 		<age></age> 								<!-- The edit age of the revision -1 for the most recent age-->
+		<value></value>								<!-- The value of the revision +/- -->
 		<comment></comment>							<!-- The comment included with this revision -->
 		<text xml:space="preserve"></text>			<!-- The text of this revision -->
 	</revision>

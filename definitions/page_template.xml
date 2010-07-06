@@ -7,6 +7,6 @@
 	</links>
 	<editor_count></editor_count> 						<!-- The number of editors who have contributed to this page -->
 	<revisions>											<!-- The edits which have been made on this page -->
-		<userrev revisionid="1212" user="username" />	<!-- The details of this specific edit. Not the text though -->
+		<userrev revisionid="1212" user="username" value="+/-"/>	<!-- The details of this specific edit. Not the text though -->
 	</revisions>
 </page>
