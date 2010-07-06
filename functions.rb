@@ -4,33 +4,18 @@ include Amatch
 @parse_folder = "parsed_data"
 @scraped_folder = "scraped_data"
 
-# Seperates all the users that edited a page
-# into registered and unregistered groups
-def process_user_hash
-  ip_check = Regexp.new(/^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/) #Regexp to identify IP addresses
-  #Make sure the two hases are initilized
-  @reg_hash = {} if @reghash.nil?
-  @unreg_hash = {} if @reghash.nil?
-  
-  @user_hash.keys.each do |user|
-    if !ip_check.match(user).nil?       # Checks if username is an IP address
-      @unreg_hash[user] = @unreg_hash.fetch(user, 0) + 1
-    else
-      @reg_hash[user] = @reg_hash.fetch(user, 0) + 1
-    end
-  end
-end
-
 # On every turn in the loop the following much be done
 def process_revision rev, revs, page
   @user_hash[rev.user] = @user_hash.fetch(rev.user, 0)+1    # Collect user information
   rev.hash = Digest::SHA1.hexdigest rev.text                # Set the hash value (a hash of the text) for each revisions
   rev.age = compute_edit_age rev, revs.last                 # Get the edit age
-  # revision_add_revision rev, revert?(rev, revs), page             # Add the contents of the current revision to the revision file
   
   if revs.length > 1
+    # puts rev.text.size.to_s+" "+revs.last.text.size.to_s
     compute_intermediate_revision rev, revs.last, revs
+    
     if @prev_length === revs.length
+      rev.value = compute_value rev, revs
       revision_add_revision revs.fetch(revs.length-3), revert?(rev, revs), page             # Add the contents of the current revision to the revision file
     end
   end
@@ -80,11 +65,9 @@ def user_add_revision name, page, revisionid
       begin
         if str[i..i+10].eql? "</userpage>" 
           file = str[0..i+10]+"<userpage name=\"#{page}\" >"+str[i..str.length]
-          # File.open("#{@parse_folder}/user_#{name}.xml", "w"){|f| f.write(file)}
           user_insert_revision name, file, page, revisionid
         elsif str[i..i+16].eql? "</reverted_count>"
           file = str[0..i+16]+"<userpage name=\"#{page}\" ></userpage>"+str[i+16+1..str.length]
-          # File.open("#{@parse_folder}/user_#{name}.xml", "w"){|f| f.write(file)}
           user_insert_revision name, file, page, revisionid
         end
         i-=1
@@ -107,7 +90,7 @@ def page_add_revision page, user, revisionid
     begin
       # Go Backward until you've found the page we're looking for.
       if str[i..i+11].eql? "</revisions>"
-        file = str[0..i-1]+"<userrev revisionid=\"#{revisionid}\" user=\"#{user}\"/>"+str[i..str.length]
+        file = str[0..i-1]+"<userrev revisionid=\"#{revisionid}\" user=\"#{user}\" />"+str[i..str.length]
         File.open("#{@parse_folder}/page_#{page}.xml", "w"){|f| f.write(file)}
       end
       i -=1
@@ -151,6 +134,7 @@ def revision_add_revision rev, revert, page
   revision_file += "<timestamp>#{rev.timestamp}</timestamp>"
   revision_file += "<unixtime>#{Time.parse(rev.timestamp).to_i}</unixtime>"
   revision_file += "<age>#{rev.age}</age>"
+  revision_file += "<value>#{rev.value}</value>"
   revision_file += "<comment>#{strip rev.comment}</comment>"
   revision_file += "<text xml:space=\"preserve\">#{strip rev.text}</text>"
   revision_file += "</revision>"
@@ -218,19 +202,41 @@ def compute_time_taken num
 end
 
 # Compute whether this is a positive, negative or neutral edit.
-def compute_value rev
+def compute_value rev, revs
   rev.age
+  #      2
+  #    ↗ |
+  #  1   |
+  #    ↘ ↓
+  #      3  
+  one = revs.fetch(revs.length-2).text
+  two = revs.last.text
+  three = rev.text
   
+  if !(one.hash === three.hash) # If its a revert, theres no use in computing the edit distance
+    one_to_two = one.jarowinkler_similar two
+    two_to_three = two.jarowinkler_similar three
+    one_to_three =  one.jarowinkler_similar three
+    if one_to_three == 1.0
+  	  puts revs.fetch(revs.length-2).user
+  	  puts revs.last.user
+      puts rev.user
+    end
+    if one_to_two > two_to_three+0.01 && two_to_three+0.01 < one_to_three      
+      return "-"
+    end
+  end
+  return "+"
 end
 
 # See if the current revision is exactly the same as a previous revision (a revert)
 # Also identify over how many revisions the revert was made
 def revert? rev, revs
   i = revs.length
-  revs.each do |each|
-    if rev.hash.eql? each.hash
+  revs.each do |old_rev|
+    if rev.hash.eql? old_rev.hash
       #puts "#{rev.user} just reverted back #{i} revisions to #{each.user}'s version" 
-      return each.revid
+      return old_rev.revid
       # puts revs.fetch(revs.length-(i+1)).user
       # puts "#{rev.hash} #{rev.user} #{rev.timestamp}"
       # puts "#{each.hash} #{each.user} #{each.timestamp}"
