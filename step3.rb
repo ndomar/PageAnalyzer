@@ -5,7 +5,7 @@ pages = File.read("pages.txt").split
 pages.each do |page|
   revert_count = 0
   prev_revert_id = 0
-  revisions = Revision.parse File.read"data/revisions_#{page}.xml"
+  revisions = Revision.parse File.read"parsed_data/revisions_#{page}.xml"
   revisions.reverse.each do |revision|
     if prev_revert_id === revision.revid
       puts "-- #{revision.user} is the originator" #{revision.revid}"
