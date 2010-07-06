@@ -28,7 +28,6 @@ puts "  Processing files downloaded from wikipedia:"
 puts "    #{set_name_length "Page"} Revisions, Links"
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------# 
 start = Time.now
-
 pages.each do |page|
   print "    #{set_name_length page.clone.capitalize}"
   @user_hash = {}; @unreg_hash = {}; @reg_hash = {} # Initialise/Empty User Hashes for each page
@@ -48,10 +47,6 @@ pages.each do |page|
       page_add_revision page, rev.user, rev.revid
       # puts "------"
     end
-    # if !@prev.nil?
-    #   puts @prev.text.levenshtein_similar rev.text
-    # end
-    # @prev = rev
     
     # Once the last revision is reached, make sure to save any leftover revisions
     if rev === revisions.last
