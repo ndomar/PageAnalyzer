@@ -2,4 +2,5 @@
 bot_login.rb
 papers/*
 parsed_data/*
+presentation/*
 scraped_data/*
