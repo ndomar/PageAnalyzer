@@ -226,9 +226,10 @@ def compute_value rev, revs
       revs.last.value =  "-"
     end
   end
-  if revs.last.text.age > 3600
+  if revs.last.text.age > 60*60*2
     revs.last.value = "+"
   end
+  return ""
 end
 
 # See if the current revision is exactly the same as a previous revision (a revert)
