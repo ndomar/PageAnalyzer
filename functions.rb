@@ -15,7 +15,7 @@ def process_revision rev, revs, page
     compute_intermediate_revision rev, revs.last, revs
     
     if @prev_length === revs.length
-      rev.value = compute_value rev, revs
+      compute_value rev, revs
       revision_add_revision revs.fetch(revs.length-3), revert?(rev, revs), page             # Add the contents of the current revision to the revision file
     end
   end
@@ -223,10 +223,12 @@ def compute_value rev, revs
       puts rev.user
     end
     if one_to_two > two_to_three+0.01 && two_to_three+0.01 < one_to_three      
-      return "-"
+      revs.last.value =  "-"
     end
   end
-  return "+"
+  if revs.last.text.age > 3600
+    revs.last.value = "+"
+  end
 end
 
 # See if the current revision is exactly the same as a previous revision (a revert)
