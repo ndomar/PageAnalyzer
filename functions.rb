@@ -226,7 +226,7 @@ def compute_value rev, revs
       revs.last.value =  "-"
     end
   end
-  if revs.last.page > 60*60*2
+  if revs.last.age > 60*60*2
     revs.last.value = "+"
   end
   return ""
