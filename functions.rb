@@ -26,8 +26,8 @@ end
 # Check to see if this middle edit was a bad edit, in the eyes of the other two
 def bad_edit? rev1, rev2, rev3
   if rev1 > rev2 && rev2 < rev3
-    puts rev2.user
-    puts rev2.comment
+#    puts rev2.user
+#    puts rev2.comment
   end
 end
 
@@ -218,15 +218,15 @@ def compute_value rev, revs
     two_to_three = two.jarowinkler_similar three
     one_to_three =  one.jarowinkler_similar three
     if one_to_three == 1.0
-  	  puts revs.fetch(revs.length-2).user
-  	  puts revs.last.user
-      puts rev.user
+#  	  puts revs.fetch(revs.length-2).user
+#  	  puts revs.last.user
+#     puts rev.user
     end
     if one_to_two > two_to_three+0.01 && two_to_three+0.01 < one_to_three      
       revs.last.value =  "-"
     end
   end
-  if revs.last.age > 60*60*2
+  if revs.last.page > 60*60*2
     revs.last.value = "+"
   end
   return ""
