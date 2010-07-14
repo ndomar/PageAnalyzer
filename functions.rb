@@ -13,7 +13,8 @@ def process_revision rev, revs, page
   if revs.length > 1
     # puts rev.text.size.to_s+" "+revs.last.text.size.to_s
     compute_intermediate_revision rev, revs.last, revs
-    
+    # Compute_intermediate revision removes multiple sequential revisions by the same person. It removes all but the latest one
+    # Thus if the length hasn't' changed then no revisions were removed
     if @prev_length === revs.length
       revision_add_revision revs.fetch(revs.length-3), revert?(rev, revs), page             # Add the contents of the current revision to the revision file
     end
