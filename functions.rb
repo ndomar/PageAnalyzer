@@ -15,7 +15,6 @@ def process_revision rev, revs, page
     compute_intermediate_revision rev, revs.last, revs
     
     if @prev_length === revs.length
-      compute_value rev, revs
       revision_add_revision revs.fetch(revs.length-3), revert?(rev, revs), page             # Add the contents of the current revision to the revision file
     end
   end
@@ -134,7 +133,6 @@ def revision_add_revision rev, revert, page
   revision_file += "<timestamp>#{rev.timestamp}</timestamp>"
   revision_file += "<unixtime>#{Time.parse(rev.timestamp).to_i}</unixtime>"
   revision_file += "<age>#{rev.age}</age>"
-  revision_file += "<value>#{rev.value}</value>"
   revision_file += "<comment>#{strip rev.comment}</comment>"
   revision_file += "<text xml:space=\"preserve\">#{strip rev.text}</text>"
   revision_file += "</revision>"
@@ -204,30 +202,31 @@ end
 # Compute whether this is a positive, negative or neutral edit.
 def compute_value rev, revs
   rev.age
+  # In the example shown below, 2 is a negative edit
   #      2
   #    ↗ |
   #  1   |
   #    ↘ ↓
   #      3  
-  one = revs.fetch(revs.length-2).text
-  two = revs.last.text
-  three = rev.text
+  one = revs.fetch(revs.length-2)
+  two = revs.last
+  three = rev
   
   if !(one.hash === three.hash) # If its a revert, theres no use in computing the edit distance
-    one_to_two = one.jarowinkler_similar two
-    two_to_three = two.jarowinkler_similar three
-    one_to_three =  one.jarowinkler_similar three
+#    one_to_two = one.text.jarowinkler_similar two.text
+#    two_to_three = two.text.jarowinkler_similar three.text
+#    one_to_three =  one.text.jarowinkler_similar three.text
     if one_to_three == 1.0
-#  	  puts revs.fetch(revs.length-2).user
-#  	  puts revs.last.user
-#     puts rev.user
+#  	  puts one
+#  	  puts two
+#     puts three
     end
     if one_to_two > two_to_three+0.01 && two_to_three+0.01 < one_to_three      
-      revs.last.value =  "-"
+      two.value =  "-"
     end
   end
-  if revs.last.age > 60*60*2
-    revs.last.value = "+"
+  if two.age > 60*60*2
+    two.value = "+"
   end
   return ""
 end

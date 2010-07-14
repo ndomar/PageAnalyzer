@@ -6,7 +6,7 @@
 	<reverts></reverts> 						<!-- The number of edits this user has reverted this user has done -->
 	<reverted_count></reverted_count> 			<!-- The number of edits of the user that have been reverted -->
 	<userpage name="Google" >
-		<userrev revisionid="1212" value="=/-"/>
-		<userrev revisionid="1212" value="=/-" />
+		<userrev revisionid="1212" />
+		<userrev revisionid="1212" />
 	</userpage>
 </user>

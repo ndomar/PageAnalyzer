@@ -7,7 +7,6 @@
 		<timestamp></timestamp> 					<!-- The date-time timestamp of this revision -->
 		<unixtime></unixtime>						<!-- The unix timestamp of this revision -->
 		<age></age> 								<!-- The edit age of the revision -1 for the most recent age-->
-		<value></value>								<!-- The value of the revision +/- -->
 		<comment></comment>							<!-- The comment included with this revision -->
 		<text xml:space="preserve"></text>			<!-- The text of this revision -->
 	</revision>
