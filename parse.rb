@@ -37,24 +37,16 @@ pages.each do |page|
   File.open("#{@folder}/page_#{page}.xml", "w"){|f| f.write("<?xml version=\"1.0\"?><page><name>#{page}</name><revisions></revisions></page>")}
   
   data_string = File.read "scraped_data/#{page}.xml"    # Get the scraped data (revisions) for this page
-  @prev_user = ""
-  count = 0
   revs = []
   revisions = Rev.parse data_string                     # Use HappyMapper to make an array of the revisions
   revisions.reverse.each do |rev|
-    if rev.user === @prev_user
-      count++;
-    end
-    @prev_user = rev.user
     if !rev.text.nil?      
       process_revision rev, revs, page         # What must be done on each revision/revision_file
       user_add_revision rev.user, page, rev.revid
       page_add_revision page, rev.user, rev.revid
       # puts "------"
     end
-   
-   puts revisions.size
-   puts count
+    
     # Once the last revision is reached, make sure to save any leftover revisions
     if rev === revisions.last
       revision_add_revision revs.fetch(revs.length-2), revert?(rev, revs), page
