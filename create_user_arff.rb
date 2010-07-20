@@ -23,10 +23,9 @@ for file in Dir['**/user_*']
 
   user = User.parse File.read "#{file}"
 
-  puts "\nName: "+user.name
-  puts "Bot?: "+user.bot.to_s
-  puts "Reg?: "+user.registered.to_s
-
+#  puts "\nName: "+user.name
+#  puts "Bot?: "+user.bot.to_s
+#  puts "Reg?: "+user.registered.to_s
 
   bot = user.bot
   registered = user.registered
@@ -35,21 +34,37 @@ for file in Dir['**/user_*']
   if user.reverted_over.nil? then reverted_over = 0 else reverted_over = user.reverted_over end
 
   user.pages.each do |page|
-    puts "  "+page.name
+#    puts "  "+page.name
     edit_count += page.revisions.length 
     page.revisions.each do |revision|
-      puts "    "+revision.revisionid.to_s
+#      puts "    "+revision.revisionid.to_s
     end
   end
 
-  puts
-  puts "Edit Count:        "+edit_count.to_s
-  puts "% Positive:        "+percent_positive.to_s
-  puts "% Negative:        "+percent_negative.to_s
-  puts "Reverted to:       "+reverted_to.to_s
-  puts "Reverted over:     "+reverted_over.to_s
-  puts "Pages Count:       "+pages_count.to_s
-  puts "Bot?:              "+bot.to_s
-  puts "Registered?:       "+registered.to_s
-  puts 
+#  puts
+#  puts "Edit Count:        "+edit_count.to_s
+#  puts "% Positive:        "+percent_positive.to_s
+#  puts "% Negative:        "+percent_negative.to_s
+#  puts "Reverted to:       "+reverted_to.to_s
+#  puts "Reverted over:     "+reverted_over.to_s
+#  puts "Pages Count:       "+pages_count.to_s
+#  puts "Bot?:              "+bot.to_s
+#  puts "Registered?:       "+registered.to_s
+#  puts 
+
+#
+# bot
+# registered
+# edit_count
+# percent_positive
+# percent_negative
+# reverted_to
+# reverted_over
+# pages_count
+# 
+
+
+str = bot.to_s+","+registered.to_s+","+edit_count.to_s+","+percent_positive.to_s+","+percent_negative.to_s+","+reverted_to.to_s+","+reverted_over.to_s+","+pages_count.to_s+"\n"
+File.open("user.csv", "a"){|f| f.write(str)}
+
 end
