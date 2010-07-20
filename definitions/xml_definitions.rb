@@ -66,7 +66,6 @@ class Revision
   element :timestamp, DateTime
   element :unixtime, Integer
   element :age, Integer
-  element :value, String
   element :comment, String
   element :text, String
 end
@@ -75,9 +74,8 @@ end
 # It should probably be renamed.... But I'll get round to that in a bit
 class UserRev
   include HappyMapper
-  attribute :revisionid, String
+  attribute :revisionid, Integer
   attribute :user, String
-  attribute :value, String
 end
 
 # Defines a page a user has contributed to
@@ -92,9 +90,10 @@ end
 class User
   include HappyMapper
   element :name, String
+  element :bot, Boolean
   element :registered, String
-  element :reverted, Integer
-  element :reverted_count, Integer
+  element :reverted_to, Integer
+  element :reverted_over, Integer
   has_many :pages, UserPage
 end
 
