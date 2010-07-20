@@ -47,8 +47,8 @@ def user_add_revision name, page, revisionid
     user.pages.each do |p|                            # Does an entry for the page exist already
       if p.name.eql? page
         page_exists = true
-        p.revisions.each do |revision|                # Does an entry for the revision exist already?
-          if revision.revisionid.eql? revisionid
+        p.revisions.each do |revision|                # Does an entry for the revision exist already?      
+          if revision.revisionid === revisionid
             revision_exists = true
           end
         end
@@ -59,22 +59,22 @@ def user_add_revision name, page, revisionid
       if !revision_exists
         user_insert_revision name, str, page, revisionid # If it does, append this revision to the file
       end
-    else                                         # If the page is not already there, add it in
+    else                                            # If the page is not already there, add it in
       i = str.length
       file =nil
       begin
         if str[i..i+10].eql? "</userpage>" 
           file = str[0..i+10]+"<userpage name=\"#{page}\" >"+str[i..str.length]
           user_insert_revision name, file, page, revisionid
-        elsif str[i..i+16].eql? "</reverted_count>"
-          file = str[0..i+16]+"<userpage name=\"#{page}\" ></userpage>"+str[i+16+1..str.length]
+        elsif str[i..i+12].eql? "</registered>"
+          file = str[0..i+12]+"<userpage name=\"#{page}\" ></userpage>"+str[i+12+1..str.length]
           user_insert_revision name, file, page, revisionid
         end
         i-=1
       end while file.nil? && i > -1
     end
   else                                                # If it doesn't, then create it
-    file = "<?xml version=\"1.0\"?>\n<user>\n<name>#{name}</name>\n<bot>#{bot? name}</bot>\n<registered>#{registered? name}</registered>\n<reverts></reverts>\n<reverted_count></reverted_count>\n</user>"
+    file = "<?xml version=\"1.0\"?>\n<user>\n<name>#{name}</name>\n<bot>#{bot? name}</bot>\n<registered>#{registered? name}</registered>\n\n</user>"
     File.open("#{@parse_folder}/user_#{name}.xml", "w"){|f| f.write(file)}
     user_add_revision name, page, revisionid    # And call this method again
   end
@@ -162,11 +162,39 @@ def user_insert_revision name, str, page, revisionid
   end while file.nil? && i > -1
 end
 
+def user_insert_reverted_to_count name, reverted_to_count
+  str = File.read "#{@parse_folder}/user_#{name}.xml"
+  file = nil
+  i = 0
+  begin
+    # Go Backward until you've found the page we're looking for.
+    if str[i..i+9].eql? "<userpage "
+      file = str[0..i-1]+"<reverted_to>#{reverted_to_count}</reverted_to>\n"+str[i..str.length]
+      File.open("#{@parse_folder}/user_#{name}.xml", "w"){|f| f.write(file)}
+    end
+    i +=1
+  end while file.nil? && i < str.length
+end
+
+def user_insert_reverted_over_count name, reverted_over_count
+  str = File.read "#{@parse_folder}/user_#{name}.xml"
+  file = nil
+  i = 0
+  begin
+    # Go Backward until you've found the page we're looking for.
+    if str[i..i+9].eql? "<userpage "
+      file = str[0..i-1]+"<reverted_over>#{reverted_over_count}</reverted_over>\n"+str[i..str.length]
+      File.open("#{@parse_folder}/user_#{name}.xml", "w"){|f| f.write(file)}
+    end
+    i +=1
+  end while file.nil? && i < str.length
+end
+
 # Add a link to a page file, based on the xml definition
 # as seen in the definitions/page_template.xml
 def page_add_links page, links
   file = nil
-  str = File.read "parsed_data/page_#{page}.xml"
+  str = File.read "#{@parse_folder}/page_#{page}.xml"
   i = 0
   begin
     if str[i..i+7].eql? "</name>"
