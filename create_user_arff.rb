@@ -63,8 +63,9 @@ for file in Dir['**/user_*']
 # pages_count
 # 
 
-
-str = bot.to_s+","+registered.to_s+","+edit_count.to_s+","+percent_positive.to_s+","+percent_negative.to_s+","+reverted_to.to_s+","+reverted_over.to_s+","+pages_count.to_s+"\n"
-File.open("user.csv", "a"){|f| f.write(str)}
+  if registered === "true" && !name.include?(",") && !name.include?("'")
+    str = name.to_s+","+bot.to_s+","+registered.to_s+","+edit_count.to_s+","+reverted_to.to_s+","+reverted_over.to_s+","+pages_count.to_s+", \n"
+    File.open("user.csv", "a"){|f| f.write(str)}
+  end
 
 end
