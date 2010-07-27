@@ -1,4 +1,5 @@
 # This file provides a number of custom functions used in the parse.rb file
+["rubygems", "happymapper",  "functions", "definitions/xml_definitions"].each {|x| require x}
 require "amatch"
 include Amatch
 @parse_folder = "parsed_data"
@@ -181,13 +182,27 @@ def user_insert_reverted_over_count name, reverted_over_count
   file = nil
   i = 0
   begin
-    # Go Backward until you've found the page we're looking for.
     if str[i..i+9].eql? "<userpage "
       file = str[0..i-1]+"<reverted_over>#{reverted_over_count}</reverted_over>\n"+str[i..str.length]
       File.open("#{@parse_folder}/user_#{name}.xml", "w"){|f| f.write(file)}
     end
     i +=1
   end while file.nil? && i < str.length
+end
+
+def user_insert_rating filename, rating
+  str = File.read filename
+  if User.parse(File.read(filename)).rating.nil?
+    file = nil
+    i = 0
+    begin
+      if str[i..i+6].eql? "</name>"
+        file = str[0..i+6]+"\n<rating>#{rating}</rating>"+str[i+6+1..str.length]
+        File.open(filename, "w"){|f| f.write(file)}
+      end
+      i +=1
+    end while file.nil? && i < str.length
+  end
 end
 
 # Add a link to a page file, based on the xml definition
@@ -295,7 +310,8 @@ def bot? name
   return false
 end
 
-def set_name_length str
+def set_name_length input
+  str = input.clone
   if str.length < 19
     str << ":"
     begin 
