@@ -20,10 +20,7 @@ for file in Dir['./parsed_data/user_*']
   rating              = nil
   
   user = User.parse File.read "#{file}"
-  
-#  puts "\nName: "+user.name
-#  puts "Bot?: "+user.bot.to_s
-#  puts "Reg?: "+user.registered.to_s
+
   name        = user.name
   bot         = user.bot
   registered  = user.registered
@@ -33,16 +30,12 @@ for file in Dir['./parsed_data/user_*']
   if user.reverted_over.nil?  then reverted_over = 0 else reverted_over = user.reverted_over end
 
   user.pages.each do |page|
-#    puts "  "+page.name
     edit_count += page.revisions.length 
-    page.revisions.each do |revision|
-#      puts "    "+revision.revisionid.to_s
-    end
   end
   
   if !name.include?(",") && !name.include?("'") && !name.include?("%") && registered === "true" #&& rating.eql?(" ")
-        # name,         bot,         edit_count,         reverted to,         reverted over,        pagescount,           rating
-    str = name.to_s+","+bot.to_s+","+edit_count.to_s+","+reverted_to.to_s+","+reverted_over.to_s+","+pages_count.to_s+","+rating.to_s+"\n"
+        # bot,         edit_count,         reverted to,         reverted over,        pagescount,           rating
+    str = bot.to_s+","+edit_count.to_s+","+reverted_to.to_s+","+reverted_over.to_s+","+pages_count.to_s+","+rating.to_s+"\n"
     File.open(user_file, "a"){|f| f.write(str)}
     count += 1
     if (count % 5 == 0) then print " " end
