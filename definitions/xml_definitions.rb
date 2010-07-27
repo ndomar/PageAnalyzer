@@ -91,6 +91,7 @@ class User
   include HappyMapper
   element :name, String
   element :bot, Boolean
+  element :rating, String
   element :registered, String
   element :reverted_to, Integer
   element :reverted_over, Integer
