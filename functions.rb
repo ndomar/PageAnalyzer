@@ -322,7 +322,7 @@ def set_name_length input
     str = str[0..15]
     str << "..: "
   else
-    str << ":"
+    str << ": "
   end
   return str.gsub("_", " ")
 end
