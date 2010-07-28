@@ -4,7 +4,7 @@
 include Amatch
 STDOUT.sync = true
 
-pages = File.read("pages.txt").split
+pages = File.read(@pages_list).split
 @folder = "parsed_data"
 
 @bot_list_file = ""

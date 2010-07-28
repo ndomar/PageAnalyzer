@@ -2,6 +2,7 @@
 ["rubygems", "happymapper",  "functions", "definitions/xml_definitions"].each {|x| require x}
 require "amatch"
 include Amatch
+@pages_list = "pages/pages.txt"
 @parse_folder = "parsed_data"
 @scraped_folder = "scraped_data"
 

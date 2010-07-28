@@ -2,7 +2,7 @@
 ["rubygems", "curb", "bot_login", "wiki_login", "functions"].each {|x| require x}
 
 revisions_to_get = 1000
-pages = File.read("pages.txt").split
+pages = File.read(@pages_list).split
 
 # Truncates the head of an xml document making it
 # start with the opening tag of the first revision

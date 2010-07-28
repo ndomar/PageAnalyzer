@@ -5,18 +5,18 @@ File.open(user_file, "w"){|f| f.write("Pagename,User Count,Reliable User Count,R
 
 
 start = Time.now
-  Pagename = 0
-  User Count = 0
-  Reliable User Count = 0
-  Reliable User Percentage = 0
-  Reliable User Edit Count = 0
-  Reliable User Edit Percentage = 0
-  Other User Count = 0
-  Other User Percentage = 0
-  Other User Edit Count = 0
-  Other User Edit Percentage = 0
-  Revert Count = 0
-  Link Count = 0
+  pagename = 0
+  user_count = 0
+  reliable_user_count = 0
+  reliable_user_percentage = 0
+  reliable_user_edit_count = 0
+  reliable_user_edit_percentage = 0
+  other_user_count = 0
+  other_user_percentage = 0
+  other_user_edit_count = 0
+  other_user_editpercentage = 0
+  revert_count = 0
+  link_count = 0
 
 
   # Pagename, User Count, Reliable User Count, Reliable User Percentage, Reliable User Edit Count, Reliable User Edit Percentage, Other User Count, Other User Percentage, Other User Edit Count, Other User Edit Percentage, Revert Count, Link Count

@@ -1,6 +1,6 @@
 ["rubygems", "happymapper",  "functions", "definitions/xml_definitions", "amatch"].each {|x| require x}
 puts "------------------------------------------------------------------------------------------"
-pages = File.read("pages.txt").split
+pages = File.read(@pages_list).split
 if ARGV[0] then user_file = ARGV[0] else user_file = "user.csv" end
 File.open(user_file, "w"){|f| f.write("Bot,Edit Count,Reverted to,Reverted over,Pagescount,Rating\n")}
 

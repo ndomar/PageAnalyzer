@@ -1,6 +1,6 @@
-["rubygems", "happymapper", "definitions/xml_definitions", "functions"].each {|x| require x}
+require "functions"
 puts "------------------------------------------------------------------------------------------"
-pages = File.read("pages.txt").split
+pages = File.read(@pages_list).split
 
 @revert_hash        = {}
 @user_reverted_to   = {}
