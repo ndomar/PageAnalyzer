@@ -32,42 +32,41 @@ pages.each do |page|
   print "    #{set_name_length page.clone.capitalize}"
   @user_hash = {}; @unreg_hash = {}; @reg_hash = {} # Initialise/Empty User Hashes for each page
   
-  # Create the two files we will be editing for this page
+# Create the two files we will be editing for this page
   File.open("#{@folder}/revisions_#{page}.xml", "w"){|f| f.write("<?xml version=\"1.0\"?><revisions>")}
   File.open("#{@folder}/page_#{page}.xml", "w"){|f| f.write("<?xml version=\"1.0\"?><page><name>#{page}</name><revisions></revisions></page>")}
-  
   data_string = File.read "scraped_data/#{page}.xml"    # Get the scraped data (revisions) for this page
   revs = []
   revisions = Rev.parse data_string                     # Use HappyMapper to make an array of the revisions
   revisions.reverse.each do |rev|
-    if !rev.text.nil?      
-      process_revision rev, revs, page         # What must be done on each revision/revision_file
-      user_add_revision rev.user, page, rev.revid
-      page_add_revision page, rev.user, rev.revid
-      # puts "------"
-    end
-    
-    # Once the last revision is reached, make sure to save any leftover revisions
-    if rev === revisions.last
-      revision_add_revision revs.fetch(revs.length-2), revert?(rev, revs), page
-      revision_add_revision rev, revert?(rev, revs), page
-    end
+  if !rev.text.nil?      
+    process_revision rev, revs, page         # What must be done on each revision/revision_file
+    user_add_revision rev.user, page, rev.revid
+    page_add_revision page, rev.user, rev.revid
+    # puts "------"
   end
+    
+  # Once the last revision is reached, make sure to save any leftover revisions
+  if rev === revisions.last
+    revision_add_revision revs.fetch(revs.length-2), revert?(rev, revs), page
+    revision_add_revision rev, revert?(rev, revs), page
+  end
+end
+  
   File.open("#{@folder}/revisions_#{page}.xml", "a"){|f| f.write("</revisions>")}
   data_string = nil
   revisions = nil
   print "    ✓"
-  
+        
   link_string = File.read "scraped_data/#{page}_links.xml" # Get the scraped data (links) for this page
   links = Bl.parse link_string
   
   # Parse and organise the list of links
-  link_text = "<links>"
+  link_text = "<links>\n"
   links.each do |link|
-    link_text += "<link pageid=\"#{link.pageid}\" title=\"#{link.title}\">"
+    link_text += "<link pageid=\"#{link.pageid}\" title=\"#{strip link.title}\" />\n"
   end
   link_text += "</links>"
-  
   page_add_links page, link_text # Insert the links into the page file
   puts "        ✓"
 end
