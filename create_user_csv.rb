@@ -33,7 +33,7 @@ for file in Dir['./parsed_data/user_*']
     edit_count += page.revisions.length 
   end
   
-  if !name.include?(",") && !name.include?("'") && !name.include?("%") && registered === "true" #&& rating.eql?(" ")
+  if !name.include?(",") && !name.include?("'") && !name.include?("%") && registered === "true" # && rating.eql?(" ")
         # bot,         edit_count,         reverted to,         reverted over,        pagescount,           rating
     str = bot.to_s+","+edit_count.to_s+","+reverted_to.to_s+","+reverted_over.to_s+","+pages_count.to_s+","+rating.to_s+"\n"
     File.open(user_file, "a"){|f| f.write(str)}
