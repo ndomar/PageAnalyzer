@@ -213,9 +213,9 @@ def page_add_links page, links
   str = File.read "#{@parse_folder}/page_#{page}.xml"
   i = 0
   begin
-    if str[i..i+7].eql? "</name>"
-      file = [0..i+7]+links+[i+8..str.length]
-      File.open("data/page_#{page}.xml", "w"){|f| f.write(file)}
+    if str[i..i+6].eql? "</name>"
+      file = str[0..i+6]+links+str[i+7..str.length]
+      File.open("#{@parse_folder}/page_#{page}.xml", "w"){|f| f.write(file)}
     end
     i += 1
   end while file.nil? && i < str.length
