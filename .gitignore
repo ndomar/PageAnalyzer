@@ -1,6 +1,7 @@
 .DS_Store
 bot_login.rb
 papers/*
+results/*
 parsed_data/*
 presentation/*
 scraped_data/*
