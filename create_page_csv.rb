@@ -1,7 +1,7 @@
 require "functions"
 
 if ARGV[0] then user_file = ARGV[0] else user_file = "pages.csv" end
-File.open(user_file, "w"){|f| f.write("Pagename,Edit Count,Link Count,Revert Count,User Count,Reliable User Count,Other User Count,Anon User Count,Reliable User Percentage,Other User Percentage,Anon User Percentage,Reliable User Edit Percentage,Other User Edit Percentage,Anon User Edit Percentage,Rating\n")}
+File.open(user_file, "w"){|f| f.write("Pagename,Edit Count,Link Count,Revert Count,User Count,Reliable User Count,Other User Count,Reliable User Percentage,Other User Percentage,Reliable User Edit Percentage,Other User Edit Percentage,Rating\n")}
 STDOUT.sync = true
 start = Time.now
 
@@ -16,12 +16,22 @@ for file in Dir['./parsed_data/user_*']
 end
 print "  ✓\n"
 
+# good_pages = File.read("pages/Articles_FA.txt").split
+# good_pages += File.read("pages/Articles_A.txt").split
+# good_pages += File.read("pages/Articles_GA.txt").split
+# 
+# medium_pages = File.read("pages/Articles_B.txt").split
+# medium_pages += File.read("pages/Articles_C.txt").split
+# 
+# poor_pages = File.read("pages/Articles_Start.txt").split
+# poor_pages += File.read("pages/Articles_Stub.txt").split
+
 good_pages = File.read("pages/Articles_FA.txt").split
 good_pages += File.read("pages/Articles_A.txt").split
 good_pages += File.read("pages/Articles_GA.txt").split
+good_pages += File.read("pages/Articles_B.txt").split
 
-medium_pages = File.read("pages/Articles_B.txt").split
-medium_pages += File.read("pages/Articles_C.txt").split
+medium_pages = File.read("pages/Articles_C.txt").split
 
 poor_pages = File.read("pages/Articles_Start.txt").split
 poor_pages += File.read("pages/Articles_Stub.txt").split
@@ -84,12 +94,6 @@ for file in Dir['./parsed_data/page_*']
   other_user_edit_percentage    = other_user_edit_count/(edit_count*1.000)
   anon_user_edit_percentage     = anon_user_edit_count/(edit_count*1.000)
   
-  # if reliable_user_count + other_user_count + anon_user_count == user_count
-  #   puts "SUCCESS: "+reliable_user_count.to_s+" + "+other_user_count.to_s+" + "+anon_user_count.to_s+" = "+user_count.to_s
-  # else
-  #   puts "FAILURE: "+reliable_user_count.to_s+" + "+other_user_count.to_s+" + "+anon_user_count.to_s+" != "+user_count.to_s
-  # end
-  
   page.links.each do |link|
     link_count+= 1
   end
@@ -134,10 +138,10 @@ for file in Dir['./parsed_data/page_*']
   
   name.gsub! "'", ""
   name.gsub! ",", ""
-  if !rating.eql? "medium"
+  if rating.eql? "medium"
     puts set_name_length(name)+"    "+rating+":    ✓"
-    #     Pagename,     Edit Count,         Link Count,         Revert Count,         User Count,         Reliable User Count,              Other User Count,         Anon User Count,         Reliable User Percentage,        Other User Percentage,          Anon User Percentage,         Reliable User Edit Percentage,         Other User Edit Percentage,         Anon User Edit Percentage,         Rating
-    str = name+","+edit_count.to_s+","+link_count.to_s+","+revert_count.to_s+","+user_count.to_s+","+reliable_user_percentage.to_s+","+other_user_count.to_s+","+anon_user_count.to_s+","+reliable_user_percentage.to_s+","+other_user_percentage.to_s+","+anon_user_percentage.to_s+","+reliable_user_edit_percentage.to_s+","+other_user_edit_percentage.to_s+","+anon_user_edit_percentage.to_s+","+rating+"\n"
+    #     Pagename,Edit Count,         Link Count,         Revert Count,         User Count,         Reliable User Count,         Other User Count        Reliable User Percentage,        Other User Percentage,                  Reliable User Edit Percentage,         Other User Edit Percentage,                 Rating
+    str = name+","+edit_count.to_s+","+link_count.to_s+","+revert_count.to_s+","+user_count.to_s+","+reliable_user_count.to_s+","+(other_user_count+anon_user_count).to_s+","+reliable_user_percentage.to_s+","+(other_user_percentage+anon_user_percentage).to_s+","+reliable_user_edit_percentage.to_s+","+(other_user_edit_percentage+anon_user_edit_percentage).to_s+","+rating+"\n"
     File.open(user_file, "a"){|f| f.write(str)}
   end
 end

@@ -318,7 +318,7 @@ def set_name_length input
     begin 
       str << " "
     end while str.length < 20
-  elsif str.length > 19
+  elsif str.length >= 19
     str = str[0..15]
     str << "..: "
   else

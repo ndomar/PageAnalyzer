@@ -1,5 +1,5 @@
-good   = ["FA", "A", "GA"]
-medium = ["B", "C"]
+good   = ["FA", "A", "GA","B"]
+medium = ["C"]
 poor   = ["Start", "Stub"]
 
 File.open("pages/pages.txt", "w"){|f| f.write("")}
@@ -17,13 +17,13 @@ File.open("pages/pages.txt", "w"){|f| f.write("")}
   begin
     pages_write_count = 0
     str.each {|t| pages_write_count += 1 }
-    if i > pages_write_count then i = 0 end
-
+    if i >= pages.size then i = 0 end
     if (rand(chance*100) > rand(chance*100)+(100-(chance*100))) && !str.include?(pages[i])
       str += pages[i]+"\n"
+      puts pages[i]
     end
     i += 1
-  end while pages_write_count <= 100
+  end while pages_write_count <= 300
   File.open("pages/pages.txt", "a"){|f| f.write(str)}
   puts "------------------------------------"
 end

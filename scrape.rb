@@ -64,7 +64,7 @@ File.open("#{@folder}/bot_list.xml", "w"){|f| f.write(bot_list.body_str)}
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------# 
 # Go to wikipedia and download the data for the various pages that were requested
 puts "\nFetching data from Wikipedia for the following pages"
-puts " #{set_name_length "Page"} Revs, Links, Done"
+puts " #{set_name_length("Page")} Revs, Links, Done"
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------# 
 revisions_per_query = 500                     # Set the maximum number of revisions per query to get (Max 500)                           # Tracks the time taken for each individual download. Not used at the moment
 total_timer_start = Time.now
@@ -73,7 +73,7 @@ total_link_count = 0
 STDOUT.sync = true
 
 pages.each do |page|  
-  print " #{set_name_length page.clone}"
+  print " #{set_name_length(page)}"
   last_rev = 0
   last_link = 0
   revision_count = 0
@@ -118,8 +118,8 @@ pages.each do |page|
   end while revision_count < revisions_to_get && revisions_this_query != 0
   
   File.open("#{@folder}/#{page}.xml", "a"){|f| f.write("</revisions></page></pages></query><query-continue><revisions rvstartid=\"357322858\" /></query-continue></api>")} # Once we have all the results we need, append the correct ending to the file.
-  total_revision_count += revision_count
-  print "#{revision_count}"
+  # total_revision_count += revision_count
+  # print "#{revision_count}"
   
   # Get the links pointing to this page
   begin  
