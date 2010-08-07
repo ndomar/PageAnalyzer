@@ -1,9 +1,2 @@
 .DS_Store
-bot_login.rb
-papers/*
-results/*
-parsed_data/*
-presentation/*
-scraped_data/*
-final_report/*
-pages/Articles_*
+config/bot_login.rb
