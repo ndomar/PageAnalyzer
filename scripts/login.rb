@@ -1,17 +1,12 @@
-# This code logs you into wikipedia using the API. 
-# It gets the usernme, password & useragent from bot_login.rb
-
-if @user_name.nil? || @password.nil?
-  puts "X No username and password supplied.\n      If you want to use a bot, please edit the 'config/bot_login.rb' file"
-end
+# This code logs you into wikipedia using the API.
 
 #--------------------------------------------------------------------------------------------------------------------------------------#
 # Start Login to the English Wikipedia Site #
 puts "\nEstablishing Connection"
 #--------------------------------------------------------------------------------------------------------------------------------------#
 login_xml = Curl::Easy.new "http://en.wikipedia.org/w/api.php?action=login&format=xml" do |curl|
-  curl.http_post Curl::PostField.content("lgname", @user_name), Curl::PostField.content("lgpassword", @password)
-  curl.headers["User-Agent"] = @user_agent
+  curl.http_post Curl::PostField.content("lgname", @username), Curl::PostField.content("lgpassword", @password)
+  curl.headers["User-Agent"] = @useragent
   # Extract the cookie set in the header
   curl.on_header do |header|
     if header.include?("Set-Cookie: enwiki_session=") && header.include?("; path=/; HttpOnly")      
@@ -48,10 +43,10 @@ puts "Attempting to Login"
 #--------------------------------------------------------------------------------------------------------------------------------------#
 headers = []
 confirm = Curl::Easy.new "http://en.wikipedia.org/w/api.php?action=login&format=xml" do |curl|
-  curl.http_post  Curl::PostField.content("lgname", @user_name),
+  curl.http_post  Curl::PostField.content("lgname", @username),
                   Curl::PostField.content("lgpassword", @password),
                   Curl::PostField.content("lgtoken", @token)
-  curl.headers["User-Agent"] = @user_agent
+  curl.headers["User-Agent"] = @useragent
   curl.cookies = @enwiki_session
   curl.on_header do |header|
     if header.include? "Set-Cookie: "

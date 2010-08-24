@@ -10,8 +10,14 @@ require "config/config"
 require "scripts/functions_scrape"
 require "scripts/functions"
 
+# Read in the list of pages
 @pages = File.read(@pages_list).split
 
 # Runtime files
-require "scripts/login"
-require "scripts/scrape"
+
+if login_present? @username, @password, @useragent
+  require "scripts/login"
+end
+
+# require "scripts/scrape"
+require "scripts/parse"

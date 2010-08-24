@@ -1,17 +1,13 @@
 # This parses the information in an xml doc downloaded using the scrape2.rb script
 # This is the script that will extract all the information we want.
-["rubygems", "happymapper", "digest/sha1", "functions", "definitions/xml_definitions", "amatch"].each {|x| require x}
+["rubygems","digest/sha1","amatch"].each {|x| require x}
 include Amatch
 STDOUT.sync = true
 
-pages = File.read(@pages_list).split
-@folder = "parsed_data"
-
-@bot_list_file = ""
-
-if !File.directory? @folder # If a directectory called pages does not exist in the current folder, create it.
-  puts "\nCreated the #{@folder} folder to store parsed data"
-  Dir.mkdir @folder
+@parsed_folder
+if !File.directory? @parsed_folder # If a directectory called pages does not exist in the current folder, create it.
+  puts "\nCreated the #{@parsed_folder} folder to store parsed data"
+    Dir.mkdir @parsed_folder
 end
 
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------# 
@@ -19,8 +15,8 @@ end
 print "  Processing Bot List"
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------# 
 U.parse(File.read "scraped_data/bot_list.xml").each {|bot| @bot_list_file += bot.name+"\n" }
-File.open("#{@folder}/bot_list.xml", "w"){|f| f.write(@bot_list_file)}
-@bot_list =  File.read("#{@folder}/bot_list.xml").split("\n")
+File.open("#{@parsed_folder}/bot_list.xml", "w"){|f| f.write(@bot_list_file)}
+@bot_list =  File.read("#{@parsed_folder}/bot_list.xml").split("\n")
 puts " ✓"
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------# 
 # Processing files downloaded from wikipedia.
@@ -33,8 +29,8 @@ pages.each do |page|
   @user_hash = {}; @unreg_hash = {}; @reg_hash = {} # Initialise/Empty User Hashes for each page
   
 # Create the two files we will be editing for this page
-  File.open("#{@folder}/revisions_#{page}.xml", "w"){|f| f.write("<?xml version=\"1.0\"?><revisions>")}
-  File.open("#{@folder}/page_#{page}.xml", "w"){|f| f.write("<?xml version=\"1.0\"?><page><name>#{page}</name><revisions></revisions></page>")}
+  File.open("#{@parsed_folder}/revisions_#{page}.xml", "w"){|f| f.write("<?xml version=\"1.0\"?><revisions>")}
+  File.open("#{@parsed_folder}/page_#{page}.xml", "w"){|f| f.write("<?xml version=\"1.0\"?><page><name>#{page}</name><revisions></revisions></page>")}
   data_string = File.read "scraped_data/#{page}.xml"    # Get the scraped data (revisions) for this page
   revs = []
   revisions = Rev.parse data_string                     # Use HappyMapper to make an array of the revisions
@@ -53,7 +49,7 @@ pages.each do |page|
   end
 end
   
-  File.open("#{@folder}/revisions_#{page}.xml", "a"){|f| f.write("</revisions>")}
+  File.open("#{@parsed_folder}/revisions_#{page}.xml", "a"){|f| f.write("</revisions>")}
   data_string = nil
   revisions = nil
   print "    ✓"

@@ -1,5 +1,4 @@
-# $: << File.join(File.dirname(__FILE__), "/../")
-# This file provides a number of custom functions used in the parse.rb file
+# This file provides a number of custom functions
 require "amatch"
 include Amatch
 
@@ -342,4 +341,16 @@ def strip str
   str.gsub! ">", "&gt;"
   str.gsub! "&", "&amp;"
   return str
+end
+
+
+def login_present? username, password, useragent
+  if username.nil? || password.nil?
+    puts "X No username and password supplied.\n      If you want to use a bot, please edit the 'config/bot_login.rb' file"
+    return false
+  elsif useragent.nil? || useragent.eql?("") || useragent.eql?(" ")
+    puts "X No user agent provided. This needs to be set. Please edit the config/bot_login.rb file.\n Otherwise Wikipedia block you!"
+    return false
+  end
+  return true
 end

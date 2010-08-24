@@ -23,4 +23,4 @@
 @scraped_folder = "downloaded_data"
 
 # Where to store the data when it parsed into a more consise form.
-@parsed_folder  = "parsed_data"
+@parsed_folder  = "parsed_data""

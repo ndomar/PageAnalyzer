@@ -8,6 +8,11 @@ class TestFunctions < Test::Unit::TestCase
     assert_equal bad_edit?(3, 2, 3), "-"
   end
   
+  def test_login_present?
+    assert login_present? "Chris", "Salij", "test"
+    assert !(login_present? nil,nil,nil)
+  end
+  
   def test_set_name_length
     array = [
       "",

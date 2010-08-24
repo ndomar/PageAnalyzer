@@ -12,7 +12,7 @@ puts "  Fetching bot list ✓"
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------# 
 bot_list = Curl::Easy.perform "http://en.wikipedia.org/w/api.php?action=query&list=allusers&augroup=bot&aulimit=max&format=xml" do |curl|   # Make the request
   curl.cookies = @cookies                       # Set the login Cookies
-  curl.headers = {"User-Agent" => @user_agent}
+  curl.headers = {"User-Agent" => @useragent}
 end # puts text.body_str
 
 File.open("#{@scraped_folder}/bot_list.xml", "w"){|f| f.write(bot_list.body_str)}
@@ -20,7 +20,7 @@ File.open("#{@scraped_folder}/bot_list.xml", "w"){|f| f.write(bot_list.body_str)
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------# 
 # Go to wikipedia and download the data for the various pages that were requested
 puts "\nFetching data from Wikipedia for the following pages"
-puts " #{set_name_length("Page")} Revs, Links, Done"
+puts " #{set_name_length("Page", 20)}#{set_name_length("Revs",7,",")}#{set_name_length("Links",7,",")}Done"
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------# 
 revisions_per_query = 500                     # Set the maximum number of revisions per query to get (Max 500)                           # Tracks the time taken for each individual download. Not used at the moment
 total_timer_start = Time.now
@@ -28,8 +28,8 @@ total_revision_count = 0
 total_link_count = 0
 STDOUT.sync = true
 
-@pages.each do |page|  
-  print " #{set_name_length(page)}"
+@pages.each do |page|
+  print " #{set_name_length(page,20,":")}"
   last_rev = 0
   last_link = 0
   revision_count = 0
@@ -49,7 +49,7 @@ STDOUT.sync = true
     
     text = Curl::Easy.perform query_url do |curl|   # Make the request
       curl.cookies = @cookies                       # Set the login Cookies
-      curl.headers = {"User-Agent" => @user_agent}
+      curl.headers = {"User-Agent" => @useragent}
     end # puts text.body_str
     
     page_data = text.body_str
@@ -75,7 +75,7 @@ STDOUT.sync = true
   
   File.open("#{@scraped_folder}/#{page}.xml", "a"){|f| f.write("</revisions></page></pages></query><query-continue><revisions rvstartid=\"357322858\" /></query-continue></api>")} # Once we have all the results we need, append the correct ending to the file.
   total_revision_count += revision_count
-  print " "+revision_count.to_s
+  print set_name_length(revision_count.to_s,7,",")
   
   # Get the links pointing to this page
   begin  
@@ -88,7 +88,7 @@ STDOUT.sync = true
     
     text = Curl::Easy.perform query_url do |curl|       # Make the request
       curl.cookies = @cookies                       	# Set the login Cookies
-      curl.headers = {"User-Agent" => @user_agent}
+      curl.headers = {"User-Agent" => @useragent}
     end # puts text.body_str
     
     links_this_query = Bl.parse(text.body_str).length 	# Get the amount of links returned in this query
@@ -107,10 +107,10 @@ STDOUT.sync = true
   end while links_this_query > 0                # While there is still more to get, get more links
   
   File.open("#{@scraped_folder}/#{page}_links.xml", "w"){|f| f.write(@page_data)}
-  print ", #{link_count},"
+  print set_name_length(link_count.to_s,7,",")
   total_link_count += link_count
   
-  puts "    ✓"
+  puts " ✓"
 end
 
 puts "\a"
