@@ -1,10 +1,9 @@
-["rubygems", "curb", "happymapper", "definitions/xml_definitions", "bot_login"].each {|x| require x}
+["definitions/xml_definitions"].each {|x| require x}
 # This code logs you into wikipedia using the API. 
 # It gets the usernme, password & useragent from bot_login.rb
 
-@folder = "scraped_data"
 if @user_name.nil? || @password.nil?
-  puts "X Please Supply a username and password"
+  puts "X No username and password supplied.\n      If you want to use a bot, please edit the 'config/bot_login.rb' file"
 end
 
 #--------------------------------------------------------------------------------------------------------------------------------------#
@@ -106,9 +105,9 @@ headers.reverse.each do |cookie|
   end while !cont.eql? "stop"
 end # puts @cookies
 
-if !File.directory? @folder # If a directectory called pages does not exist in the current folder, create it.
+if !File.directory? @scraped_folder # If a directectory called pages does not exist in the current folder, create it.
   puts "Created the 'pages' folder to store downloaded data"
-  Dir.mkdir @folder
+  Dir.mkdir @scraped_folder
 end
 
 # At this point you are now logged in to wikipedia.

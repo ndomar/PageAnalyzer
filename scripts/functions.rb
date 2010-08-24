@@ -1,10 +1,8 @@
+# $: << File.join(File.dirname(__FILE__), "/../")
 # This file provides a number of custom functions used in the parse.rb file
 ["rubygems", "happymapper",  "functions", "definitions/xml_definitions"].each {|x| require x}
 require "amatch"
 include Amatch
-@pages_list = "pages/pages.txt"
-@parse_folder = "parsed_data"
-@scraped_folder = "scraped_data"
 
 # On every turn in the loop the following much be done
 def process_revision rev, revs, page
