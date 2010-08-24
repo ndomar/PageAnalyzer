@@ -1,4 +1,3 @@
-["definitions/xml_definitions"].each {|x| require x}
 # This code logs you into wikipedia using the API. 
 # It gets the usernme, password & useragent from bot_login.rb
 
@@ -104,11 +103,6 @@ headers.reverse.each do |cookie|
     i += 1
   end while !cont.eql? "stop"
 end # puts @cookies
-
-if !File.directory? @scraped_folder # If a directectory called pages does not exist in the current folder, create it.
-  puts "Created the 'pages' folder to store downloaded data"
-  Dir.mkdir @scraped_folder
-end
 
 # At this point you are now logged in to wikipedia.
 # @cookies is the cookie to send to wikipedia to verify yourself as a user.

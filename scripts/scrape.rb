@@ -1,8 +1,10 @@
 # This code is not pretty. It is not optimised, but it works.
-["curb", "functions_scrape"].each {|x| require x}
+require "curb"
 
-revisions_to_get = 1000
-# pages = File.read(@pages_list).split
+if !File.directory? @scraped_folder # Create directory to store the downloaded files
+  puts "Created the 'pages' folder to store downloaded data"
+  Dir.mkdir @scraped_folder
+end
 
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------# 
 # Go to wikipedia and download the list of all bots currently registered on the site
@@ -13,7 +15,7 @@ bot_list = Curl::Easy.perform "http://en.wikipedia.org/w/api.php?action=query&li
   curl.headers = {"User-Agent" => @user_agent}
 end # puts text.body_str
 
-File.open("#{@folder}/bot_list.xml", "w"){|f| f.write(bot_list.body_str)}
+File.open("#{@scraped_folder}/bot_list.xml", "w"){|f| f.write(bot_list.body_str)}
 
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------# 
 # Go to wikipedia and download the data for the various pages that were requested
@@ -26,7 +28,7 @@ total_revision_count = 0
 total_link_count = 0
 STDOUT.sync = true
 
-pages.each do |page|  
+@pages.each do |page|  
   print " #{set_name_length(page)}"
   last_rev = 0
   last_link = 0
@@ -34,10 +36,10 @@ pages.each do |page|
   link_count = 0
   @page_data = ""
   
-  File.open("#{@folder}/#{page}.xml", "w"){|f| f.write("")}
+  File.open("#{@scraped_folder}/#{page}.xml", "w"){|f| f.write("")}
   begin   # Get the revisions
-    if revisions_to_get < revisions_per_query
-      revisions_to_get = revisions_per_query
+    if @revisions_to_get < revisions_per_query
+      @revisions_to_get = revisions_per_query
     end
     if last_rev == 0          # If we're on the first query, get the last X revisions starting at the most recent revision available
       query_url = "http://en.wikipedia.org/w/api.php?action=query&prop=revisions&titles=#{page}&rvprop=ids|timestamp|user|comment|content&rvlimit=#{revisions_per_query}&format=xml"
@@ -64,16 +66,16 @@ pages.each do |page|
       # This adds an extra tag to each revision. It means that the text of each revision can be accessed as an element of it.
       page_data.gsub! 'xml:space="preserve">', 'xml:space="preserve"><text>'
       page_data.gsub! '</rev>', '</text></rev>'
-      File.open("#{@folder}/#{page}.xml", "a"){|f| f.write(page_data)} # Append the current set of revisions to the existing ones
+      File.open("#{@scraped_folder}/#{page}.xml", "a"){|f| f.write(page_data)} # Append the current set of revisions to the existing ones
       last_rev = Rev.parse(text.body_str).last.revid              # Store the revision to continue on in the next query
     end
     text = nil
     page_data = nil
-  end while revision_count < revisions_to_get && revisions_this_query != 0
+  end while revision_count < @revisions_to_get && revisions_this_query != 0
   
-  File.open("#{@folder}/#{page}.xml", "a"){|f| f.write("</revisions></page></pages></query><query-continue><revisions rvstartid=\"357322858\" /></query-continue></api>")} # Once we have all the results we need, append the correct ending to the file.
-  # total_revision_count += revision_count
-  # print "#{revision_count}"
+  File.open("#{@scraped_folder}/#{page}.xml", "a"){|f| f.write("</revisions></page></pages></query><query-continue><revisions rvstartid=\"357322858\" /></query-continue></api>")} # Once we have all the results we need, append the correct ending to the file.
+  total_revision_count += revision_count
+  print " "+revision_count.to_s
   
   # Get the links pointing to this page
   begin  
@@ -104,7 +106,7 @@ pages.each do |page|
     end
   end while links_this_query > 0                # While there is still more to get, get more links
   
-  File.open("#{@folder}/#{page}_links.xml", "w"){|f| f.write(@page_data)}
+  File.open("#{@scraped_folder}/#{page}_links.xml", "w"){|f| f.write(@page_data)}
   print ", #{link_count},"
   total_link_count += link_count
   

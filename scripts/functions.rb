@@ -1,6 +1,5 @@
 # $: << File.join(File.dirname(__FILE__), "/../")
 # This file provides a number of custom functions used in the parse.rb file
-["rubygems", "happymapper",  "functions", "definitions/xml_definitions"].each {|x| require x}
 require "amatch"
 include Amatch
 
@@ -311,19 +310,29 @@ def bot? name
   return false
 end
 
-def set_name_length input
+def set_name_length input, length, ending = " "
+  if length < 5
+    return input
+  end
+  
   str = input.clone
-  if str.length < 19
-    str << ":"
+  if str.length < length-1
+    str << ending
     begin 
       str << " "
-    end while str.length < 20
-  elsif str.length >= 19
-    str = str[0..15]
-    str << "..: "
+    end while str.length < length
+  elsif str.length >= length-1
+    if ending.eql? " "
+      str = str[0..length-4]
+      str << ".. "
+    else
+      str = str[0..length-5]
+      str << "..#{ending} "
+    end
   else
-    str << ": "
+    str << "#{ending} "
   end
+  
   return str.gsub("_", " ")
 end
 
