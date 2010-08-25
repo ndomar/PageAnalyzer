@@ -1,3 +1,4 @@
 .DS_Store
 config/bot_login.rb
 downloaded_data
+parsed_data

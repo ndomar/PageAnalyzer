@@ -4,7 +4,6 @@
 include Amatch
 STDOUT.sync = true
 
-@parsed_folder
 if !File.directory? @parsed_folder # If a directectory called pages does not exist in the current folder, create it.
   puts "\nCreated the #{@parsed_folder} folder to store parsed data"
     Dir.mkdir @parsed_folder
@@ -13,25 +12,26 @@ end
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------# 
 # Process the list of registered bots we have downloaded from wikipedia
 print "  Processing Bot List"
-#--------------------------------------------------------------------------------------------------------------------------------------------------------------# 
-U.parse(File.read "scraped_data/bot_list.xml").each {|bot| @bot_list_file += bot.name+"\n" }
+#--------------------------------------------------------------------------------------------------------------------------------------------------------------# fa
+@bot_list_file = ""
+U.parse(File.read "#{@scraped_folder}/bot_list.xml").each {|bot| @bot_list_file += bot.name+"\n" }
 File.open("#{@parsed_folder}/bot_list.xml", "w"){|f| f.write(@bot_list_file)}
-@bot_list =  File.read("#{@parsed_folder}/bot_list.xml").split("\n")
+@bot_list = File.read("#{@parsed_folder}/bot_list.xml").split("\n")
 puts " ✓"
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------# 
 # Processing files downloaded from wikipedia.
 puts "  Processing files downloaded from wikipedia:"
-puts "    #{set_name_length "Page"} Revisions, Links"
+puts "    "+set_name_length("Page",20,",")+set_name_length("Revisions",15,",")+set_name_length("Links",10)
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------# 
 start = Time.now
-pages.each do |page|
-  print "    #{set_name_length page.clone.capitalize}"
+@pages.each do |page|
+  print "    #{set_name_length page.capitalize, 20, ":"}"
   @user_hash = {}; @unreg_hash = {}; @reg_hash = {} # Initialise/Empty User Hashes for each page
   
 # Create the two files we will be editing for this page
   File.open("#{@parsed_folder}/revisions_#{page}.xml", "w"){|f| f.write("<?xml version=\"1.0\"?><revisions>")}
   File.open("#{@parsed_folder}/page_#{page}.xml", "w"){|f| f.write("<?xml version=\"1.0\"?><page><name>#{page}</name><revisions></revisions></page>")}
-  data_string = File.read "scraped_data/#{page}.xml"    # Get the scraped data (revisions) for this page
+  data_string = File.read "#{@scraped_folder}/#{page}.xml"    # Get the scraped data (revisions) for this page
   revs = []
   revisions = Rev.parse data_string                     # Use HappyMapper to make an array of the revisions
   revisions.reverse.each do |rev|
@@ -54,7 +54,7 @@ end
   revisions = nil
   print "    ✓"
         
-  link_string = File.read "scraped_data/#{page}_links.xml" # Get the scraped data (links) for this page
+  link_string = File.read "#{@scraped_folder}/#{page}_links.xml" # Get the scraped data (links) for this page
   links = Bl.parse link_string
   
   # Parse and organise the list of links

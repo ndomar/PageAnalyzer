@@ -38,8 +38,8 @@ def user_add_revision name, page, revisionid
   	name.gsub! "&", "and"
   end
   
-  if File.exists? "#{@parse_folder}/user_#{name}.xml"             # Check to see if the user exits
-    str = File.read "#{@parse_folder}/user_#{name}.xml"
+  if File.exists? "#{@parsed_folder}/user_#{name}.xml"             # Check to see if the user exits
+    str = File.read "#{@parsed_folder}/user_#{name}.xml"
     user = User.parse str
     
     page_exists = false
@@ -75,7 +75,7 @@ def user_add_revision name, page, revisionid
     end
   else                                                # If it doesn't, then create it
     file = "<?xml version=\"1.0\"?>\n<user>\n<name>#{name}</name>\n<bot>#{bot? name}</bot>\n<registered>#{registered? name}</registered>\n\n</user>"
-    File.open("#{@parse_folder}/user_#{name}.xml", "w"){|f| f.write(file)}
+    File.open("#{@parsed_folder}/user_#{name}.xml", "w"){|f| f.write(file)}
     user_add_revision name, page, revisionid    # And call this method again
   end
 end
@@ -84,14 +84,14 @@ end
 # for the layout of a page file
 def page_add_revision page, user, revisionid
   #  puts "inserting user rev #{revisionid}"
-    str = File.read "#{@parse_folder}/page_#{page}.xml"
+    str = File.read "#{@parsed_folder}/page_#{page}.xml"
     file = nil
     i = str.length
     begin
       # Go Backward until you've found the page we're looking for.
       if str[i..i+11].eql? "</revisions>"
         file = str[0..i-1]+"<userrev revisionid=\"#{revisionid}\" user=\"#{user}\" />"+str[i..str.length]
-        File.open("#{@parse_folder}/page_#{page}.xml", "w"){|f| f.write(file)}
+        File.open("#{@parsed_folder}/page_#{page}.xml", "w"){|f| f.write(file)}
       end
       i -=1
     end while file.nil? && i > -1
@@ -137,7 +137,7 @@ def revision_add_revision rev, revert, page
   revision_file += "<comment>#{strip rev.comment}</comment>"
   revision_file += "<text xml:space=\"preserve\">#{strip rev.text}</text>"
   revision_file += "</revision>"
-  File.open("#{@parse_folder}/revisions_#{page}.xml", "a"){|f| f.write(revision_file)}
+  File.open("#{@parsed_folder}/revisions_#{page}.xml", "a"){|f| f.write(revision_file)}
 end
 
 # Insert a revision to a user file, based on the xml definition
@@ -153,7 +153,7 @@ def user_insert_revision name, str, page, revisionid
       begin       # Once you found the page, go forward until we're at the right section to insert
         if str[j..j+10].eql? "</userpage>"
           file = str[0..j-1]+"<userrev revisionid=\"#{revisionid}\" />"+str[j..str.length]
-          File.open("#{@parse_folder}/user_#{name}.xml", "w"){|f| f.write(file)}
+          File.open("#{@parsed_folder}/user_#{name}.xml", "w"){|f| f.write(file)}
         end
         j += 1
       end while file.nil? && j < str.length-10
@@ -163,27 +163,27 @@ def user_insert_revision name, str, page, revisionid
 end
 
 def user_insert_reverted_to_count name, reverted_to_count
-  str = File.read "#{@parse_folder}/user_#{name}.xml"
+  str = File.read "#{@parsed_folder}/user_#{name}.xml"
   file = nil
   i = 0
   begin
     # Go Backward until you've found the page we're looking for.
     if str[i..i+9].eql? "<userpage "
       file = str[0..i-1]+"<reverted_to>#{reverted_to_count}</reverted_to>\n"+str[i..str.length]
-      File.open("#{@parse_folder}/user_#{name}.xml", "w"){|f| f.write(file)}
+      File.open("#{@parsed_folder}/user_#{name}.xml", "w"){|f| f.write(file)}
     end
     i +=1
   end while file.nil? && i < str.length
 end
 
 def user_insert_reverted_over_count name, reverted_over_count
-  str = File.read "#{@parse_folder}/user_#{name}.xml"
+  str = File.read "#{@parsed_folder}/user_#{name}.xml"
   file = nil
   i = 0
   begin
     if str[i..i+9].eql? "<userpage "
       file = str[0..i-1]+"<reverted_over>#{reverted_over_count}</reverted_over>\n"+str[i..str.length]
-      File.open("#{@parse_folder}/user_#{name}.xml", "w"){|f| f.write(file)}
+      File.open("#{@parsed_folder}/user_#{name}.xml", "w"){|f| f.write(file)}
     end
     i +=1
   end while file.nil? && i < str.length
@@ -208,12 +208,12 @@ end
 # as seen in the definitions/page_template.xml
 def page_add_links page, links
   file = nil
-  str = File.read "#{@parse_folder}/page_#{page}.xml"
+  str = File.read "#{@parsed_folder}/page_#{page}.xml"
   i = 0
   begin
     if str[i..i+6].eql? "</name>"
       file = str[0..i+6]+links+str[i+7..str.length]
-      File.open("#{@parse_folder}/page_#{page}.xml", "w"){|f| f.write(file)}
+      File.open("#{@parsed_folder}/page_#{page}.xml", "w"){|f| f.write(file)}
     end
     i += 1
   end while file.nil? && i < str.length
