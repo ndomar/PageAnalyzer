@@ -55,7 +55,7 @@ def user_add_revision name, page, revisionid
       end
     end
     
-    if page_exists                                    # If the page is already there, just add the revision
+    if page_exists                                  # If the page is already there, just add the revision
       if !revision_exists
         user_insert_revision name, str, page, revisionid # If it does, append this revision to the file
       end

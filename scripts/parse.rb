@@ -21,7 +21,7 @@ puts " ✓"
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------# 
 # Processing files downloaded from wikipedia.
 puts "  Processing files downloaded from wikipedia:"
-puts "    "+set_name_length("Page",20,",")+set_name_length("Revisions",15,",")+set_name_length("Links",10)
+puts "    "+set_name_length("Page",20,",")+set_name_length("Revisions",11,",")+set_name_length("Links",10)
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------# 
 start = Time.now
 @pages.each do |page|

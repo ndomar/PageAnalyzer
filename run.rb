@@ -19,5 +19,5 @@ if login_present? @username, @password, @useragent
   require "scripts/login"
 end
 
-# require "scripts/scrape"
+require "scripts/scrape"
 require "scripts/parse"
