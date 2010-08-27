@@ -1,6 +1,11 @@
 # This code is not pretty. It is not optimised, but it works.
 require "curb"
 
+if login_present? @username, @password, @useragent
+  require "scripts/login"
+  wikipedia_login
+end
+
 if !File.directory? @scraped_folder # Create directory to store the downloaded files
   puts "Created the 'pages' folder to store downloaded data"
   Dir.mkdir @scraped_folder

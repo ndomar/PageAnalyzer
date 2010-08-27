@@ -1,14 +1,13 @@
-["rubygems", "happymapper",  "functions", "definitions/xml_definitions", "amatch"].each {|x| require x}
+require "amatch"
 puts "------------------------------------------------------------------------------------------"
-pages = File.read(@pages_list).split
-if ARGV[0] then user_file = ARGV[0] else user_file = "user.csv" end
+if !ARGV[0].nil? && ARGV[0].include?("n") then user_file = ARGV[1] else user_file = "user.csv" end
 File.open(user_file, "w"){|f| f.write("Bot,Edit Count,Reverted to,Reverted over,Pagescount,Rating\n")}
 
 STDOUT.sync = true
 count = 0
 start = Time.now
 print "|"
-for file in Dir['./parsed_data/user_*']
+for file in Dir["#{@parsed_folder}/user_*"]
   edit_count          = 0
   percent_positive    = 0
   percent_negative    = 0
