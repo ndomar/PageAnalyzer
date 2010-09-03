@@ -35,8 +35,8 @@ else
   @pages = File.read(@pages_list).split
   classpath = "\"$CLASSPATH:#{File.expand_path(File.dirname(__FILE__))}/weka/weka.jar\""
   
-  if !ARGV[0].nil? && ARGV[0].include?("n") then @user_file = ARGV[1]
-  else @user_file = "user.csv" end
+  if !ARGV[0].nil? && ARGV[0].include?("n") then @user_file = "#{@analysis_folder}/#{ARGV[1]}"
+  else @user_file = "#{@analysis_folder}/user.csv" end
   # Runtime files
   if ARGV[0].eql?("") || ARGV[0].include?("v")
     require "scripts/scrape"
@@ -65,7 +65,6 @@ else
     end
   end
   
-  
   # Remove some shit
   arff_file = File.read "#{@user_file}.arff"
   if arff_file.include? "true,255,255,255,255,reliable\ntrue,255,255,255,255,other\n"
@@ -73,7 +72,7 @@ else
     File.open("#{@user_file}.arff", "w"){|f| f.write(arff_file)}
   end
   
-  csv_file = File.read "#{@user_file}"
+  csv_file = File.read @user_file
   if csv_file.include? "true,255,255,255,255,reliable\ntrue,255,255,255,255,other\n"
     csv_file = csv_file.gsub!"true,255,255,255,255,reliable\ntrue,255,255,255,255,other\n", ""
     File.open("#{@user_file}", "w"){|f| f.write(csv_file)}
