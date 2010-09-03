@@ -2,7 +2,7 @@
 def wikipedia_login
   #--------------------------------------------------------------------------------------------------------------------------------------#
   # Start Login to the English Wikipedia Site #
-  puts "\nEstablishing Connection"
+  puts "\nEstablishing Connection" if ARGV[0].include?("v")
   #--------------------------------------------------------------------------------------------------------------------------------------#
   login_xml = Curl::Easy.new "http://en.wikipedia.org/w/api.php?action=login&format=xml" do |curl|
     curl.http_post Curl::PostField.content("lgname", @username), Curl::PostField.content("lgpassword", @password)
@@ -39,7 +39,7 @@ def wikipedia_login
 
   #--------------------------------------------------------------------------------------------------------------------------------------#
   # Complete Login to Wikipedia #
-  puts "Attempting to Login"
+  puts "Attempting to Login" if ARGV[0].include?("v")
   #--------------------------------------------------------------------------------------------------------------------------------------#
   headers = []
   confirm = Curl::Easy.new "http://en.wikipedia.org/w/api.php?action=login&format=xml" do |curl|
@@ -67,11 +67,6 @@ def wikipedia_login
   Login.parse(confirm.body_str).each do |login|
     if login.result.eql? "Success"
       puts "  Logged In ✓"
-  #     @lgusername = login.lguserid
-  #     @lgpassword = login.lgusername
-  #     @lgtoken = login.lgtoken
-  #     @cookie_prefix = login.cookieprefix
-  #     @session_id = login.sessionid
     else # If login was not successful, print an informative help message
       puts " X Login failed."
       if login.result.eql?("WrongPass") || login.result.eql?("EmptyPass") || login.result.eql?("WrongPluginPass")
@@ -86,7 +81,7 @@ def wikipedia_login
     end
   end
 
-  puts "Baking Cookies"
+  puts "Baking Cookies" if ARGV[0].include?("v")
   @cookies = "#{@enwiki_session} #{@cookie_prefix}Token=#{@lgtoken};"
   headers.reverse.each do |cookie|
     i = 0; cont = "go"

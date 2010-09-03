@@ -6,26 +6,28 @@ STDOUT.sync = true
 
 if !File.directory? @parsed_folder # If a directectory called pages does not exist in the current folder, create it.
   puts "\nCreated the #{@parsed_folder} folder to store parsed data"
-    Dir.mkdir @parsed_folder
+  Dir.mkdir @parsed_folder
 end
+
+puts "\n---------- Parsing Data ---------------------\n"
 
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------# 
 # Process the list of registered bots we have downloaded from wikipedia
-print "  Processing Bot List"
+print "\n  Processing Bot List" if ARGV[0].include?("v")
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------# fa
 @bot_list_file = ""
 U.parse(File.read "#{@scraped_folder}/bot_list.xml").each {|bot| @bot_list_file += bot.name+"\n" }
 File.open("#{@parsed_folder}/bot_list.xml", "w"){|f| f.write(@bot_list_file)}
 @bot_list = File.read("#{@parsed_folder}/bot_list.xml").split("\n")
-puts " ✓"
+puts " ✓" if ARGV[0].include?("v")
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------# 
 # Processing files downloaded from wikipedia.
-puts "  Processing files downloaded from wikipedia:"
-puts "    "+set_name_length("Page",20,",")+set_name_length("Revisions",11,",")+set_name_length("Links",10)
+puts "\nProcessing files downloaded from wikipedia:"
+puts "  "+set_name_length("Page",20,",")+set_name_length("Revisions",11,",")+set_name_length("Links",10)
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------# 
 start = Time.now
 @pages.each do |page|
-  print "    #{set_name_length page.capitalize, 20, ":"}"
+  print "  #{set_name_length page.capitalize, 20, ":"}"
   @user_hash = {}; @unreg_hash = {}; @reg_hash = {} # Initialise/Empty User Hashes for each page
   
 # Create the two files we will be editing for this page
@@ -68,5 +70,7 @@ end
 end
 
 # Print out a report of the key stats
-puts "\nTime to complete this run: #{compute_time_taken(Time.now-start)}"
-print "\a\a\a\a\a\a\a\a\a\a"
+puts "\nTime to parse data: #{compute_time_taken(Time.now-start)}"
+print "\a"
+
+puts "\n---------- Finished Parsing Data ------------\n"

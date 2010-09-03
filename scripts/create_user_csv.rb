@@ -1,12 +1,13 @@
 require "amatch"
-puts "------------------------------------------------------------------------------------------"
-if !ARGV[0].nil? && ARGV[0].include?("n") then user_file = ARGV[1] else user_file = "user.csv" end
-File.open(user_file, "w"){|f| f.write("Bot,Edit Count,Reverted to,Reverted over,Pagescount,Rating\n")}
+
+puts "\n---------- Creating User File ---------------\n\n"
+
+File.open(@user_file, "w"){|f| f.write("Bot,Edit Count,Reverted to,Reverted over,Pagescount,Rating\n")}
 
 STDOUT.sync = true
 count = 0
 start = Time.now
-print "|"
+print "|" if ARGV[0].include?("v")
 for file in Dir["#{@parsed_folder}/user_*"]
   edit_count          = 0
   percent_positive    = 0
@@ -35,12 +36,15 @@ for file in Dir["#{@parsed_folder}/user_*"]
   if !name.include?(",") && !name.include?("'") && !name.include?("%") && registered === "true" # && rating.eql?(" ")
         # bot,         edit_count,         reverted to,         reverted over,        pagescount,           rating
     str = bot.to_s+","+edit_count.to_s+","+reverted_to.to_s+","+reverted_over.to_s+","+pages_count.to_s+","+rating.to_s+"\n"
-    File.open(user_file, "a"){|f| f.write(str)}
+    File.open(@user_file, "a"){|f| f.write(str)}
     count += 1
-    if (count % 5 == 0) then print " " end
-    print "|"
+    (if (count % 5 == 0) then print " " end)if ARGV[0].include?("v")
+    print "|" if ARGV[0].include?("v")
   end
 end
 
-puts "\n\nTime to complete this run: #{compute_time_taken(Time.now-start)}\n"
-print "\a\a\a\a\a\a\a\a\a\a"
+File.open(@user_file, "a"){|f| f.write("true,255,255,255,255,reliable\ntrue,255,255,255,255,other\n")}
+
+puts "#{count} users added to the #{@user_file} file."
+puts "\a\nTime to create the user file: #{compute_time_taken(Time.now-start)}\n"
+puts "\n---------- Finished Creating User File ------\n\n"

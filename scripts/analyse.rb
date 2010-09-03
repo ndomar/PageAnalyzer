@@ -1,4 +1,4 @@
-puts
+puts "\n---------- Analysing Data -------------------\n\n"
 
 @revert_hash        = {}
 @user_reverted_to   = {}
@@ -64,8 +64,8 @@ i=0
   #puts t
 end
 
-puts "Time to complete this run: #{compute_time_taken(Time.now-start)}"
-print "\a\a\a\a\a\a\a\a\a\a"
+puts "\nTime to analyse data: #{compute_time_taken(Time.now-start)}"
+print "\a"
 
 @user_reverted_over.keys.sort.each do |key|
 #  puts "#{key} #{@user_reverted_over[key]}"
@@ -76,3 +76,5 @@ end
 @user_reverted_to.keys.sort.each do |key|
   user_insert_reverted_to_count key, @user_reverted_to[key]
 end
+
+puts "\n---------- Finished Analysing Data ----------\n"
