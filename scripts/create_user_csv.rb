@@ -2,6 +2,12 @@ require "amatch"
 
 puts "\n---------- Creating User File ---------------\n\n"
 
+if !File.directory? @analysis_folder # If a directectory called pages does not exist in the current folder, create it.
+  puts "\nCreated the #{@analysis_folder} folder to store parsed data"
+  Dir.mkdir @analysis_folder
+end
+
+
 File.open(@user_file, "w"){|f| f.write("Bot,Edit Count,Reverted to,Reverted over,Pagescount,Rating\n")}
 
 STDOUT.sync = true
