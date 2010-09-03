@@ -13,8 +13,8 @@ if ARGV[0].include? "h"
   s     - Runs the scraping code which gathers information from Wikipedia
   p     - Parses the data downloaded from Wikipedia
   a     - Analyzes and performs feature extraction of the data
-  csv   - Creates the user csv file
-  arff  - Converts the csv file to arff
+  r     - Creates the user csv file
+  t     - Converts the csv file to arff
   
   n     - Names the csv and arff files created. The name must be provided as the second argument. e.g.
     $ ruby run.rb -n \"csv_file\"
@@ -55,24 +55,27 @@ else
     if ARGV[0].include? "a"
       require "scripts/analyse"
     end
-    if ARGV[0].include? "f"
+    if ARGV[0].include? "r"
       require "scripts/create_user_csv"
     end
-    if ARGV[0].include? "c"
+    if ARGV[0].include? "t"
       # Convert the user csv file into an arff file
-      puts "Ignore the following 6 warnings. They come from Weka and are not relevant :)"
+      puts "Ignore the following 5 warnings. They come from Weka and are not relevant :)\n\n"
       system "java -cp #{classpath} -Xmx500m weka.core.converters.CSVLoader #{@user_file} > #{@user_file}.arff"
     end
   end
-
-  # puts "hit"
-  # # Remove some shit
-  # arff_file = File.read "#{@user_file}.arff"
-  # puts arff_file
-  # if arff_file.include? "true,255,255,255,255,reliable\ntrue,255,255,255,255,other\n"
-  #   arff_file.delete "true,255,255,255,255,reliable\ntrue,255,255,255,255,other\n"
-  #   puts"\n"
-  #   puts arff_file
-  #   File.open("#{@user_file}.arff", "w"){|f| f.write(arff_file)}
-  # end
+  
+  
+  # Remove some shit
+  arff_file = File.read "#{@user_file}.arff"
+  if arff_file.include? "true,255,255,255,255,reliable\ntrue,255,255,255,255,other\n"
+    arff_file = arff_file.gsub!"\ntrue,255,255,255,255,reliable\ntrue,255,255,255,255,other\n", ""
+    File.open("#{@user_file}.arff", "w"){|f| f.write(arff_file)}
+  end
+  
+  csv_file = File.read "#{@user_file}"
+  if csv_file.include? "true,255,255,255,255,reliable\ntrue,255,255,255,255,other\n"
+    csv_file = csv_file.gsub!"true,255,255,255,255,reliable\ntrue,255,255,255,255,other\n", ""
+    File.open("#{@user_file}", "w"){|f| f.write(csv_file)}
+  end
 end
