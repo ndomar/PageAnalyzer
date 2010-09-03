@@ -2,3 +2,4 @@
 config/bot_login.rb
 downloaded_data
 parsed_data
+analysis_files

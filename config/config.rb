@@ -20,7 +20,10 @@
 # N.B:These paths are relative to the main directory (which contains run.rb), not the config directory.
 
 # Where to store the data downloded from Wikipedia
-@scraped_folder = "downloaded_data"
+@scraped_folder   = "downloaded_data"
 
 # Where to store the data when it parsed into a more consise form.
-@parsed_folder  = "parsed_data"
+@parsed_folder    = "parsed_data"
+
+# Where to store the files user & page files that are analysed by weka
+@analysis_folder  = "analysis_files"
