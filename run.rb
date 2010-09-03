@@ -65,16 +65,19 @@ else
     end
   end
   
-  # Remove some shit
-  arff_file = File.read "#{@user_file}.arff"
-  if arff_file.include? "true,255,255,255,255,reliable\ntrue,255,255,255,255,other\n"
-    arff_file = arff_file.gsub!"\ntrue,255,255,255,255,reliable\ntrue,255,255,255,255,other\n", ""
-    File.open("#{@user_file}.arff", "w"){|f| f.write(arff_file)}
-  end
+  remove_string_from_file @user_file, "true,255,255,255,255,reliable\ntrue,255,255,255,255,other\n"
+  remove_string_from_file "#{@user_file}.arff", "true,255,255,255,255,reliable\ntrue,255,255,255,255,other\n"
   
-  csv_file = File.read @user_file
-  if csv_file.include? "true,255,255,255,255,reliable\ntrue,255,255,255,255,other\n"
-    csv_file = csv_file.gsub!"true,255,255,255,255,reliable\ntrue,255,255,255,255,other\n", ""
-    File.open("#{@user_file}", "w"){|f| f.write(csv_file)}
-  end
+  # # Remove some shit
+  #   arff_file = File.read "#{@user_file}.arff"
+  #   if arff_file.include? "true,255,255,255,255,reliable\ntrue,255,255,255,255,other\n"
+  #     arff_file = arff_file.gsub!"\ntrue,255,255,255,255,reliable\ntrue,255,255,255,255,other\n", ""
+  #     File.open("#{@user_file}.arff", "w"){|f| f.write(arff_file)}
+  #   end
+  #   
+  #   csv_file = File.read @user_file
+  #   if csv_file.include? "true,255,255,255,255,reliable\ntrue,255,255,255,255,other\n"
+  #     csv_file = csv_file.gsub!"true,255,255,255,255,reliable\ntrue,255,255,255,255,other\n", ""
+  #     File.open("#{@user_file}", "w"){|f| f.write(csv_file)}
+  #   end
 end

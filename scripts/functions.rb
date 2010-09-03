@@ -4,79 +4,69 @@ include Amatch
 
 # On every turn in the loop the following much be done
 def process_revision rev, revs, page
-  @user_hash[rev.user] = @user_hash.fetch(rev.user, 0)+1    # Collect user information
-  rev.hash = Digest::SHA1.hexdigest rev.text                # Set the hash value (a hash of the text) for each revisions
-  rev.age = compute_edit_age rev, revs.last                 # Get the edit age
-  
-  if revs.length > 1
-    # puts rev.text.size.to_s+" "+revs.last.text.size.to_s
-    compute_intermediate_revision rev, revs.last, revs
-    # Compute_intermediate revision removes multiple sequential revisions by the same person. It removes all but the latest one
-    # Thus if the length hasn't' changed then no revisions were removed
-    if @prev_length === revs.length
-      revision_add_revision revs.fetch(revs.length-3), revert?(rev, revs), page             # Add the contents of the current revision to the revision file
-    end
-  end
-  revs.push rev
-  @prev_length = revs.length
-end
-
-# Check to see if this middle edit was a bad edit, in the eyes of the other two
-def bad_edit? rev1, rev2, rev3
-  if rev1 > rev2 && rev2 < rev3
-    return "-"
-#    puts rev2.user
-#    puts rev2.comment
-  end
-  return "+"
+	@user_hash[rev.user] = @user_hash.fetch(rev.user, 0)+1    # Collect user information
+	rev.hash = Digest::SHA1.hexdigest rev.text                # Set the hash value (a hash of the text) for each revisions
+	rev.age = compute_edit_age rev, revs.last                 # Get the edit age
+	
+	if revs.length > 1
+		# puts rev.text.size.to_s+" "+revs.last.text.size.to_s
+		compute_intermediate_revision rev, revs.last, revs
+		# Compute_intermediate revision removes multiple sequential revisions by the same person. It removes all but the latest one
+		# Thus if the length hasn't' changed then no revisions were removed
+		if @prev_length === revs.length
+			revision_add_revision revs.fetch(revs.length-3), revert?(rev, revs), page             # Add the contents of the current revision to the revision file
+		end
+	end
+	revs.push rev
+	@prev_length = revs.length
 end
 
 # Add a revision to a page. See definitions/user_template.xml
 # for the layout of a user file
 def user_add_revision name, page, revisionid
-  if name.include? "&"
-  	name.gsub! "&", "and"
-  end
-  
-  if File.exists? "#{@parsed_folder}/user_#{name}.xml"             # Check to see if the user exits
-    str = File.read "#{@parsed_folder}/user_#{name}.xml"
-    user = User.parse str
-    
-    page_exists = false
-    revision_exists = false
-    user.pages.each do |p|                            # Does an entry for the page exist already
-      if p.name.eql? page
-        page_exists = true
-        p.revisions.each do |revision|                # Does an entry for the revision exist already?      
-          if revision.revisionid === revisionid
-            revision_exists = true
-          end
-        end
-      end
-    end
-    
-    if page_exists                                  # If the page is already there, just add the revision
-      if !revision_exists
-        user_insert_revision name, str, page, revisionid # If it does, append this revision to the file
-      end
-    else                                            # If the page is not already there, add it in
-      i = str.length
-      file =nil
-      begin
-        if str[i..i+10].eql? "</userpage>" 
-          file = str[0..i+10]+"<userpage name=\"#{page}\" >"+str[i..str.length]
-          user_insert_revision name, file, page, revisionid
-        elsif str[i..i+12].eql? "</registered>"
-          file = str[0..i+12]+"<userpage name=\"#{page}\" ></userpage>"+str[i+12+1..str.length]
-          user_insert_revision name, file, page, revisionid
-        end
-        i-=1
-      end while file.nil? && i > -1
-    end
-  else                                                # If it doesn't, then create it
-    file = "<?xml version=\"1.0\"?>\n<user>\n<name>#{name}</name>\n<bot>#{bot? name}</bot>\n<registered>#{registered? name}</registered>\n\n</user>"
-    File.open("#{@parsed_folder}/user_#{name}.xml", "w"){|f| f.write(file)}
-    user_add_revision name, page, revisionid    # And call this method again
+	if name.include? "&"
+		name.gsub! "&", "and"
+	end
+	
+	if File.exists? "#{@parsed_folder}/user_#{name}.xml"             # Check to see if the user exits
+	 str = File.read "#{@parsed_folder}/user_#{name}.xml"
+	 user = User.parse str
+	 
+	 page_exists = false
+	 revision_exists = false
+	 user.pages.each do |p|                             # Does an entry for the page exist already
+		if p.name.eql? page
+		  page_exists = true
+		  p.revisions.each do |revision|                 # Does an entry for the revision exist already?
+			 if revision.revisionid === revisionid
+				revision_exists = true
+			 end
+		  end
+		end
+	 end
+	 
+	 if page_exists                                       # If the page is already there, just add the revision
+		if !revision_exists
+		  user_insert_revision name, str, page, revisionid # If it does, append this revision to the file
+		end
+	 else                                                 # If the page is not already there, add it in
+		i = str.length
+		file =nil
+		begin
+		  if str[i..i+10].eql? "</userpage>" 
+			 file = str[0..i+10]+"<userpage name=\"#{page}\" >"+str[i..str.length]
+			 user_insert_revision name, file, page, revisionid
+		  elsif str[i..i+12].eql? "</registered>"
+			 file = str[0..i+12]+"<userpage name=\"#{page}\" ></userpage>"+str[i+12+1..str.length]
+			 user_insert_revision name, file, page, revisionid
+		  end
+		  i-=1
+		end while file.nil? && i > -1
+	 end
+	else                                        # If it doesn't, then create it
+	 file = "<?xml version=\"1.0\"?>\n<user>\n<name>#{name}</name>\n<bot>#{bot? name}</bot>\n<registered>#{registered? name}</registered>\n\n</user>"
+	 File.open("#{@parsed_folder}/user_#{name}.xml", "w"){|f| f.write(file)}
+	 user_add_revision name, page, revisionid		# And call this method again
   end
 end
 
@@ -95,28 +85,6 @@ def page_add_revision page, user, revisionid
       end
       i -=1
     end while file.nil? && i > -1
-end
-
-# Get the age of a revision. i.e. how long that revision has lasted before it was changed
-def compute_edit_age rev1, rev2
-  if rev2.nil?
-    return nil
-  else
-    return Time.parse(rev1.timestamp).to_i-Time.parse(rev2.timestamp).to_i
-  end
-end
-
-# Computes to see if the same person made 2 revisions in a short timespan.
-# If they did, then discard the first revision and only keep the second
-# Since they obviously wanted the later revision to be their final one
-def compute_intermediate_revision rev1, rev2, revs
-  time = 3*60*60 # Years*Weeks*Days*Hours*Minues*Seconds
-  if rev1.user.eql?(rev2.user) && rev1.age < time
-    # puts "These two edits by the same person are very close together"
-    revs.pop # Remove the latest revision from the rev list
-    return true
-  end
-  return false
 end
 
 # Add a revision to a revision file, based on the xml definition
@@ -219,27 +187,36 @@ def page_add_links page, links
   end while file.nil? && i < str.length
 end
 
-# Compute how long a given number (in seconds) is
-# and returns the value in it's appropriate units
-def compute_time_taken num
-	minute = 60.000000
-	hour = 60*minute
-	day = 24*hour
-	week = 7*day
-	year = 52*week
-	if num < minute
-		return "#{num} seconds"
-	elsif num < hour
-		return  "#{num/minute} minutes"
-	elsif num < day
-		return  "#{num/hour} hours"
-	elsif num < week
-		return  "#{num/day} days"
-	elsif num < year
-		return  "#{num/week} weeks"
-	elsif num > year
-		return  "#{num/year} years"	
+# Check to see if this middle edit was a bad edit, in the eyes of the other two
+def bad_edit? rev1, rev2, rev3
+  if rev1 > rev2 && rev2 < rev3
+    return "-"
+#    puts rev2.user
+#    puts rev2.comment
+  end
+  return "+"
+end
+
+# Get the age of a revision. i.e. how long that revision has lasted before it was changed
+def compute_edit_age rev1, rev2
+  if rev2.nil?
+    return nil
+  else
+    return Time.parse(rev1.timestamp).to_i-Time.parse(rev2.timestamp).to_i
+  end
+end
+
+# Computes to see if the same person made 2 revisions in a short timespan.
+# If they did, then discard the first revision and only keep the second
+# Since they obviously wanted the later revision to be their final one
+def compute_intermediate_revision rev1, rev2, revs
+	time = 3*60*60 # Years*Weeks*Days*Hours*Minues*Seconds
+	if rev1.user.eql?(rev2.user) && rev1.age < time
+		# puts "These two edits by the same person are very close together"
+		revs.pop # Remove the latest revision from the rev list
+		return true
 	end
+	return false
 end
 
 # Compute whether this is a positive, negative or neutral edit.
@@ -307,50 +284,4 @@ def bot? name
     return true
   end
   return false
-end
-
-def set_name_length input, length, ending = " "
-  if length < 5
-    return input
-  end
-  
-  str = input.clone
-  if str.length < length-1
-    str << ending
-    begin 
-      str << " "
-    end while str.length < length
-  elsif str.length >= length-1
-    if ending.eql? " "
-      str = str[0..length-4]
-      str << ".. "
-    else
-      str = str[0..length-5]
-      str << "..#{ending} "
-    end
-  else
-    str << "#{ending} "
-  end
-  
-  return str.gsub("_", " ")
-end
-
-# Strip any encoding shouldn't be in xml
-def strip str
-  str.gsub! "<", "&lt;"
-  str.gsub! ">", "&gt;"
-  str.gsub! "&", "&amp;"
-  return str
-end
-
-
-def login_present? username, password, useragent
-  if username.nil? || password.nil?
-    puts "X No username and password supplied.\n      If you want to use a bot, please edit the 'config/bot_login.rb' file"
-    return false
-  elsif useragent.nil? || useragent.eql?("") || useragent.eql?(" ")
-    puts "X No user agent provided. This needs to be set. Please edit the config/bot_login.rb file.\n Otherwise Wikipedia block you!"
-    return false
-  end
-  return true
 end
