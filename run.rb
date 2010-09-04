@@ -3,7 +3,7 @@ require "definitions/xml_definitions"
 
 if ARGV[0].include? "h"
   puts "
-  This script accepts a number of arguments which modifys it's behaviour.
+  This script accepts a number of arguments which modifies it's behaviour.
   Calling the script in the following way would run the scraping, parsing and analysis sections of the code, but not create the user files needed for analysis.
     $ ruby run.rb -spa
   
