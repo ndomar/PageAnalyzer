@@ -25,7 +25,7 @@ Once you have set your necessary configuration information, run the ''run.rb'' f
 
 This script accepts a number of arguments which modifies it's behaviour.
   Calling the script in the following way would run the scraping, parsing and analysis sections of the code, but not create the user files needed for analysis.
-    ''$ ruby run.rb -spa''
+    $ ruby run.rb -spa
   
   v   - Verbose Output. Includes a number of printouts that describe processes that are happening in the background.
   
@@ -37,7 +37,7 @@ This script accepts a number of arguments which modifies it's behaviour.
   t     - Converts the csv file to arff
   
   n     - Names the csv and arff files created. The name must be provided as the second argument. e.g.
-    ''$ ruby run.rb -n \"csv_file\"''
+    $ ruby run.rb -n \"csv_file\"
 
 ## License ##
 
