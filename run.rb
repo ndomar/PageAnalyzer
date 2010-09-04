@@ -1,5 +1,6 @@
 ["rubygems", "curb", "happymapper"].each {|x| require x}
 require "definitions/xml_definitions"
+ARGV[0] = "" if ARGV[0].eql? nil
 
 if ARGV[0].include? "h"
   puts "
@@ -20,9 +21,7 @@ if ARGV[0].include? "h"
     $ ruby run.rb -n \"csv_file\"
   "
 else
-  ARGV[0] = "" if ARGV[0].eql? nil
-  
-  
+
   # Config files
   require "config/bot_login"
   require "config/config"
