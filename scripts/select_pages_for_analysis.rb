@@ -2,7 +2,9 @@ good   = ["FA", "A", "GA","B"]
 medium = ["C"]
 poor   = ["Start", "Stub"]
 
-File.open("pages/pages.txt", "w"){|f| f.write("")}
+file = "pages_list.txt"
+
+File.open(file, "w"){|f| f.write("")}
 
 # Go though the pages
 [good, medium, poor].each do |group|
@@ -23,7 +25,7 @@ File.open("pages/pages.txt", "w"){|f| f.write("")}
       puts pages[i]
     end
     i += 1
-  end while pages_write_count <= 300
-  File.open("pages/pages.txt", "a"){|f| f.write(str)}
+  end while pages_write_count <= 150
+  File.open(file, "a"){|f| f.write(str)}
   puts "------------------------------------"
 end

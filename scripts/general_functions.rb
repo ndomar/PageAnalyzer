@@ -52,11 +52,9 @@ end
 # Checks to see if all details required to use a bot on Wikipedia re present
 def login_present? username, password, useragent
 	if username.nil? || password.nil?
-		puts "X No username and password supplied.\n		If you want to use a bot, please edit the 'config/bot_login.rb' file"
-		return false
+		return [false, "X No username and password supplied.\n		If you want to use a bot, please edit the 'config/bot_login.rb' file"]
 	elsif useragent.nil? || useragent.eql?("") || useragent.eql?(" ")
-		puts "X No user agent provided. This needs to be set. Please edit the config/bot_login.rb file.\n Otherwise Wikipedia block you!"
-		return false
+		return [false, "X No user agent provided. This needs to be set. Please edit the config/bot_login.rb file.\n Otherwise Wikipedia block you!"]
 	end
 	return true
 end

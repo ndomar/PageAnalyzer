@@ -2,15 +2,17 @@
 require "curb"
 
 if !File.directory? @scraped_folder # Create directory to store the downloaded files
-  puts "Created the 'pages' folder to store downloaded data"
-  Dir.mkdir @scraped_folder
+	puts "Created the 'pages' folder to store downloaded data"
+	Dir.mkdir @scraped_folder
 end
 
 puts "\n---------- Gathering Data -------------------\n\n"
 
 if login_present? @username, @password, @useragent
-  require "scripts/login"
-  wikipedia_login
+	require "scripts/login"
+	wikipedia_login
+else
+	puts login_present?(@username, @password, @useragent)[0]
 end
 
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------# 
@@ -18,8 +20,8 @@ end
 puts "  Fetching bot list ✓" if ARGV[0].include?("v")
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------# 
 bot_list = Curl::Easy.perform "http://en.wikipedia.org/w/api.php?action=query&list=allusers&augroup=bot&aulimit=max&format=xml" do |curl|   # Make the request
-  curl.cookies = @cookies                       # Set the login Cookies
-  curl.headers = {"User-Agent" => @useragent}
+	curl.cookies = @cookies                       # Set the login Cookies
+	curl.headers = {"User-Agent" => @useragent}
 end # puts text.body_str
 
 File.open("#{@scraped_folder}/bot_list.xml", "w"){|f| f.write(bot_list.body_str)}
@@ -27,7 +29,7 @@ File.open("#{@scraped_folder}/bot_list.xml", "w"){|f| f.write(bot_list.body_str)
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------# 
 # Go to wikipedia and download the data for the various pages that were requested
 puts "\nFetching data from Wikipedia for the following pages"
-puts " #{set_name_length("Page", 20)}#{set_name_length("Revisions",11,",")}#{set_name_length("Links",7,",")}Done"
+puts " #{set_name_length("Page",19)}#{set_name_length("Revisions",11,",")}#{set_name_length("Links",7,",")}Done"
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------# 
 revisions_per_query = 500                     # Set the maximum number of revisions per query to get (Max 500)                           # Tracks the time taken for each individual download. Not used at the moment
 total_timer_start = Time.now
