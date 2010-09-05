@@ -27,16 +27,17 @@ This script accepts a number of arguments which modifies it's behaviour.
   Calling the script in the following way would run the scraping, parsing and analysis sections of the code, but not create the user files needed for analysis.
     $ ruby run.rb -spa
   
-  v   - Verbose Output. Includes a number of printouts that describe processes that are happening in the background.
+*	v   - Verbose Output. Includes a number of printouts that describe processes that are happening in the background.
   
-  If any or all of the following are called, then the script will only perform that action
-  s     - Runs the scraping code which gathers information from Wikipedia
-  p     - Parses the data downloaded from Wikipedia
-  a     - Analyzes and performs feature extraction of the data
-  r     - Creates the user csv file
-  t     - Converts the csv file to arff
+If any or all of the following are called, then the script will only perform that action
+
+*	s     - Runs the scraping code which gathers information from Wikipedia
+*	p     - Parses the data downloaded from Wikipedia
+*	a     - Analyzes and performs feature extraction of the data
+*	r     - Creates the user csv file
+*	t     - Converts the csv file to arff
   
-  n     - Names the csv and arff files created. The name must be provided as the second argument. e.g.
+*	n     - Names the csv and arff files created. The name must be provided as the second argument. e.g.
     $ ruby run.rb -n \"csv_file\"
 
 ## License ##
